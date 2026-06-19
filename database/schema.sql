@@ -126,3 +126,6 @@ FROM users u
 LEFT JOIN match_predictions mp ON mp.user_id = u.id
 GROUP BY u.id, u.user_name, u.initials
 ORDER BY total_points DESC, u.user_name ASC;
+
+-- Evitar partidos duplicados con mismo api_match_id en el mismo torneo
+CREATE UNIQUE INDEX IF NOT EXISTS matches_api_id_unique ON matches(tournament_id, api_match_id) WHERE api_match_id IS NOT NULL;
