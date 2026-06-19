@@ -198,11 +198,57 @@
 
 .team-block {
   display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  max-width: 200px;
+
+  &.home {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  &.away {
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+}
+
+.team-identity {
+  display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.goals-side {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
   flex: 1;
-  max-width: 160px;
+  min-width: 0;
+
+  &.home-goals {
+    align-items: flex-end;
+  }
+  &.away-goals {
+    align-items: flex-start;
+  }
+}
+
+.goal-scorer {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+
+  .goal-min {
+    color: rgba(255,255,255,0.35);
+    font-weight: 400;
+  }
 }
 
 .team-flag-img {
@@ -224,18 +270,6 @@
   letter-spacing: 1.5px;
   max-width: 130px;
   line-height: 1.2;
-}
-
-.goal-scorer {
-  font-size: 0.65rem;
-  font-weight: 600;
-  color: rgba(255,255,255,0.55);
-  text-align: center;
-  line-height: 1.5;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 130px;
 }
 
 .score-center {
@@ -1009,10 +1043,12 @@
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 480px) {
-  .match-scoreboard   { padding: 10px 12px 14px; }
+  .match-scoreboard   { padding: 10px 8px 14px; }
   .team-flag-img      { width: 48px; height: 32px; }
   .score-num          { font-size: 2rem; }
-  .team-name          { font-size: 0.65rem; max-width: 80px; }
+  .team-name          { font-size: 0.65rem; }
+  .team-block         { max-width: 140px; gap: 5px; }
+  .goal-scorer        { font-size: 0.55rem; }
   .sl-title           { font-size: 1.1rem; letter-spacing: 2px; }
   .lb-username        { font-size: 0.8rem; }
   .pts-val            { font-size: 1.1rem; }

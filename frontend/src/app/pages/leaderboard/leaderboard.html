@@ -13,13 +13,17 @@
 
       <div class="match-scoreboard">
         <div class="team-block home">
-          @if (getFlagUrl(currentMatch.home_team)) {
-            <img class="team-flag-img" [src]="getFlagUrl(currentMatch.home_team)" [alt]="currentMatch.home_team" />
-          }
-          <span class="team-name">{{ currentMatch.home_team }}</span>
-          @for (g of getMatchGoals(currentMatch, 'home'); track g.minute) {
-            <div class="goal-scorer">⚽ {{ g.scorer }} {{ g.minute }}</div>
-          }
+          <div class="goals-side home-goals">
+            @for (g of getMatchGoals(currentMatch, 'home'); track g.minute) {
+              <div class="goal-scorer">⚽ {{ g.scorer }} <span class="goal-min">{{ g.minute }}'</span></div>
+            }
+          </div>
+          <div class="team-identity">
+            @if (getFlagUrl(currentMatch.home_team)) {
+              <img class="team-flag-img" [src]="getFlagUrl(currentMatch.home_team)" [alt]="currentMatch.home_team" />
+            }
+            <span class="team-name">{{ currentMatch.home_team }}</span>
+          </div>
         </div>
 
         <div class="score-center">
@@ -46,13 +50,17 @@
         </div>
 
         <div class="team-block away">
-          @if (getFlagUrl(currentMatch.away_team)) {
-            <img class="team-flag-img" [src]="getFlagUrl(currentMatch.away_team)" [alt]="currentMatch.away_team" />
-          }
-          <span class="team-name">{{ currentMatch.away_team }}</span>
-          @for (g of getMatchGoals(currentMatch, 'away'); track g.minute) {
-            <div class="goal-scorer">⚽ {{ g.scorer }} {{ g.minute }}</div>
-          }
+          <div class="team-identity">
+            @if (getFlagUrl(currentMatch.away_team)) {
+              <img class="team-flag-img" [src]="getFlagUrl(currentMatch.away_team)" [alt]="currentMatch.away_team" />
+            }
+            <span class="team-name">{{ currentMatch.away_team }}</span>
+          </div>
+          <div class="goals-side away-goals">
+            @for (g of getMatchGoals(currentMatch, 'away'); track g.minute) {
+              <div class="goal-scorer">⚽ {{ g.scorer }} <span class="goal-min">{{ g.minute }}'</span></div>
+            }
+          </div>
         </div>
       </div>
 
