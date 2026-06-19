@@ -66,7 +66,8 @@ export class Leaderboard implements OnInit, OnDestroy {
   selectedGroup = 'Group A';
   wcLoading = false;
 
-  espnClockMap: Record<string, string> = {}; // team key → clock string
+  espnClockMap: Record<string, string> = {};
+  espnGoalsMap: Record<string, {home: any[], away: any[]}> = {};
 
   private previousEntries: LeaderboardEntry[] = [];
   private subs: Subscription[] = [];
@@ -245,17 +246,27 @@ export class Leaderboard implements OnInit, OnDestroy {
   pollESPNClock() {
     this.http.get<any[]>('/api/espn/scoreboard').subscribe({
       next: events => {
-        const map: Record<string, string> = { ...this.espnClockMap };
+        const clockMap: Record<string, string> = { ...this.espnClockMap };
+        const goalsMap: Record<string, {home: any[], away: any[]}> = { ...this.espnGoalsMap };
         for (const ev of events) {
-          if (ev.status === 'live') {
+          if (ev.status === 'live' || ev.status === 'finished') {
             const key = `${ev.home}|${ev.away}`;
-            map[key] = ev.period === 'HT' ? 'MT' : (ev.clock ?? '');
+            if (ev.status === 'live') {
+              clockMap[key] = ev.period === 'HT' ? 'MT' : (ev.clock ?? '');
+            }
+            if (ev.goals?.length > 0) {
+              goalsMap[key] = {
+                home: ev.goals.filter((g: any) => g.team === 'home'),
+                away: ev.goals.filter((g: any) => g.team === 'away'),
+              };
+            }
           }
         }
-        this.espnClockMap = map;
+        this.espnClockMap = clockMap;
+        this.espnGoalsMap = goalsMap;
         this.cdr.detectChanges();
       },
-      error: () => {} // mantiene el último valor conocido
+      error: () => {}
     });
   }
 
@@ -263,6 +274,12 @@ export class Leaderboard implements OnInit, OnDestroy {
     if (!match) return '';
     const key = `${match.home_team}|${match.away_team}`;
     return this.espnClockMap[key] ?? '';
+  }
+
+  getMatchGoals(match: LiveMatch | null, side: 'home' | 'away'): any[] {
+    if (!match) return [];
+    const key = `${match.home_team}|${match.away_team}`;
+    return this.espnGoalsMap[key]?.[side] ?? [];
   }
 
   switchView(v: 'leaderboard' | 'mundial') {

@@ -17,6 +17,9 @@
             <img class="team-flag-img" [src]="getFlagUrl(currentMatch.home_team)" [alt]="currentMatch.home_team" />
           }
           <span class="team-name">{{ currentMatch.home_team }}</span>
+          @for (g of getMatchGoals(currentMatch, 'home'); track g.minute) {
+            <div class="goal-scorer">⚽ {{ g.scorer }} {{ g.minute }}</div>
+          }
         </div>
 
         <div class="score-center">
@@ -47,6 +50,9 @@
             <img class="team-flag-img" [src]="getFlagUrl(currentMatch.away_team)" [alt]="currentMatch.away_team" />
           }
           <span class="team-name">{{ currentMatch.away_team }}</span>
+          @for (g of getMatchGoals(currentMatch, 'away'); track g.minute) {
+            <div class="goal-scorer">⚽ {{ g.scorer }} {{ g.minute }}</div>
+          }
         </div>
       </div>
 
