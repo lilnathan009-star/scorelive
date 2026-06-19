@@ -1,0 +1,200 @@
+<div class="admin-container">
+  <div class="admin-header">
+    <h1>⚙️ Panel Admin — Scorelive</h1>
+  </div>
+
+  @if (message) {
+    <div class="toast" [class.error]="messageType === 'error'">{{ message }}</div>
+  }
+
+  <!-- Torneo -->
+  <section class="card">
+    <h2>Torneo</h2>
+    <div class="row-form">
+      <input [(ngModel)]="newTournamentName" placeholder="Nombre del torneo" />
+      <button (click)="createTournament()">Crear</button>
+    </div>
+    <div class="tournament-list">
+      @for (t of tournaments; track t.id) {
+        <button class="t-btn" [class.active]="t.id === selectedTournamentId" (click)="selectTournament(t.id)">
+          {{ t.name }}
+        </button>
+      }
+    </div>
+  </section>
+
+  @if (selectedTournamentId) {
+    <!-- Tabs -->
+    <div class="tabs">
+      <button [class.active]="activeTab === 'match'" (click)="activeTab = 'match'">Partidos</button>
+      <button [class.active]="activeTab === 'groups'" (click)="activeTab = 'groups'">Grupos</button>
+      <button [class.active]="activeTab === 'semifinals'" (click)="activeTab = 'semifinals'">Semifinales</button>
+      <button [class.active]="activeTab === 'final'" (click)="activeTab = 'final'">Final</button>
+    </div>
+
+    <!-- TAB: PARTIDOS -->
+    @if (activeTab === 'match') {
+
+      <!-- Buscar en Sofascore -->
+      <section class="card">
+        <h2>🔍 Buscar Partidos del Mundial</h2>
+        <div class="row-form espn-date-nav">
+          <button (click)="searchFootballMatches(-1)">‹</button>
+          <span class="date-label">{{ formatSearchDate() }}</span>
+          <button (click)="searchFootballMatches(1)">›</button>
+          <button (click)="searchFootballMatches(0)" [disabled]="footballLoading" class="btn-search">
+            {{ footballLoading ? 'Buscando...' : '🔄 Actualizar' }}
+          </button>
+        </div>
+
+        @if (footballResults.length > 0) {
+          <div class="football-results">
+            @for (m of footballResults; track m.espnId) {
+              <div class="football-row">
+                <div class="fr-main">
+                  <span class="fr-teams">{{ m.home }} vs {{ m.away }}</span>
+                  @if (m.status === 'live') {
+                    <span class="fr-tournament" style="color:#00D4B0">
+                      {{ m.period === 'HT' ? 'MEDIO TIEMPO' : ('EN VIVO ' + (m.clock ?? '')) }}
+                    </span>
+                  } @else if (m.status === 'finished') {
+                    <span class="fr-tournament">FINALIZADO</span>
+                  }
+                </div>
+                <span class="fr-date">{{ m.date | date:'HH:mm':'America/Guayaquil' }}</span>
+                @if (m.homeScore !== null) {
+                  <span class="fr-score">{{ m.homeScore }} - {{ m.awayScore }}</span>
+                }
+                <button class="btn-use" (click)="useFootballMatch(m)">Usar →</button>
+              </div>
+            }
+          </div>
+        }
+        @if (footballResults.length === 0 && !footballLoading) {
+          <p class="hint">Navega por fecha para encontrar partidos del Mundial 2026.</p>
+        }
+      </section>
+
+      <section class="card">
+        <h2>Crear Partido</h2>
+        <div class="form-grid">
+          <input [(ngModel)]="newMatch.home_team" placeholder="Equipo local" />
+          <input [(ngModel)]="newMatch.away_team" placeholder="Equipo visitante" />
+          <input [(ngModel)]="newMatch.match_date" type="datetime-local" />
+          <input [(ngModel)]="newMatch.api_match_id" placeholder="API Match ID (opcional)" />
+          <select [(ngModel)]="newMatch.phase">
+            <option value="group">Fase grupos</option>
+            <option value="r16">R16</option>
+            <option value="quarters">Cuartos</option>
+            <option value="semis">Semifinales</option>
+            <option value="final">Final</option>
+          </select>
+        </div>
+        <button (click)="createMatch()">Crear partido</button>
+      </section>
+
+      <section class="card">
+        <h2>Cargar Pronósticos de Partido</h2>
+        <div class="row-form">
+          <select [(ngModel)]="selectedMatchId">
+            <option [ngValue]="null">— Seleccionar partido —</option>
+            @for (m of matches; track m.id) {
+              <option [ngValue]="m.id">{{ m.home_team }} vs {{ m.away_team }}</option>
+            }
+          </select>
+        </div>
+
+        <h3>Importar JSON (Scorevix)</h3>
+        <textarea [(ngModel)]="predJson" rows="6" placeholder='Pegar JSON: {"predictions":[...]}'></textarea>
+        <button (click)="importMatchPredictions()">Importar JSON</button>
+
+        <h3>Agregar manual</h3>
+        <div class="form-grid">
+          <select [(ngModel)]="manualPred.user_id">
+            <option [ngValue]="null">— Seleccionar participante —</option>
+            @for (u of users; track u.id) {
+              <option [ngValue]="u.id">{{ u.user_name }} ({{ u.initials }})</option>
+            }
+          </select>
+          <div></div>
+          <input [(ngModel)]="manualPred.home_score" type="number" placeholder="Goles local" min="0" />
+          <input [(ngModel)]="manualPred.away_score" type="number" placeholder="Goles visitante" min="0" />
+        </div>
+        <button (click)="addManualPrediction()">Agregar pronóstico</button>
+      </section>
+
+      <section class="card">
+        <h2>Ingresar Resultado Real</h2>
+        <div class="row-form">
+          <select [(ngModel)]="selectedMatchId">
+            <option [ngValue]="null">— Seleccionar partido —</option>
+            @for (m of matches; track m.id) {
+              <option [ngValue]="m.id">{{ m.home_team }} vs {{ m.away_team }}</option>
+            }
+          </select>
+          <input [(ngModel)]="resultHome" type="number" placeholder="Goles local" min="0" style="width:80px" />
+          <span>–</span>
+          <input [(ngModel)]="resultAway" type="number" placeholder="Goles visitante" min="0" style="width:80px" />
+          <button (click)="updateResult()">Guardar y calcular</button>
+        </div>
+      </section>
+    }
+
+    <!-- TAB: GRUPOS -->
+    @if (activeTab === 'groups') {
+      <section class="card">
+        <h2>Cargar Clasificados Reales por Grupo</h2>
+        <div class="form-grid">
+          <input [(ngModel)]="groupResultData.group_name" placeholder="Grupo (A, B, C...)" maxlength="3" />
+          <input [(ngModel)]="groupResultData.team1" placeholder="1er clasificado" />
+          <input [(ngModel)]="groupResultData.team2" placeholder="2do clasificado" />
+          <input [(ngModel)]="groupResultData.third_team" placeholder="Mejor tercero (opcional)" />
+        </div>
+        <button (click)="setGroupResult()">Guardar y calcular</button>
+      </section>
+
+      <section class="card">
+        <h2>Importar Pronósticos de Grupos (JSON)</h2>
+        <textarea [(ngModel)]="groupPredJson" rows="8" placeholder='[{"user_name":"...", "group_picks":{"A":["BRA","ARG"],"B":["MEX","USA","COL"]}}]'></textarea>
+        <button (click)="importGroupPredictions()">Importar</button>
+      </section>
+    }
+
+    <!-- TAB: SEMIFINALES -->
+    @if (activeTab === 'semifinals') {
+      <section class="card">
+        <h2>Semifinalistas Reales (1 por bracket)</h2>
+        <div class="form-grid">
+          @for (b of semifinalTeams; track b.bracket) {
+            <input [(ngModel)]="b.team" [placeholder]="'Bracket ' + b.bracket" />
+          }
+        </div>
+        <button (click)="setSemifinalResult()">Guardar y calcular</button>
+      </section>
+
+      <section class="card">
+        <h2>Importar Pronósticos Semifinales (JSON)</h2>
+        <textarea [(ngModel)]="semifinalPredJson" rows="6" placeholder='[{"user_name":"...","brackets":{"1":"ARG","2":"BRA","3":"FRA","4":"ESP"}}]'></textarea>
+        <button (click)="importSemifinalPredictions()">Importar</button>
+      </section>
+    }
+
+    <!-- TAB: FINAL -->
+    @if (activeTab === 'final') {
+      <section class="card">
+        <h2>Resultado Final Real</h2>
+        <div class="form-grid">
+          <input [(ngModel)]="finalResult.champion" placeholder="Campeón" />
+          <input [(ngModel)]="finalResult.runner_up" placeholder="Subcampeón" />
+        </div>
+        <button (click)="setFinalResult()">Guardar y calcular</button>
+      </section>
+
+      <section class="card">
+        <h2>Importar Pronósticos Final (JSON)</h2>
+        <textarea [(ngModel)]="finalPredJson" rows="6" placeholder='[{"user_name":"...","champion":"ARG","runner_up":"BRA"}]'></textarea>
+        <button (click)="importFinalPredictions()">Importar</button>
+      </section>
+    }
+  }
+</div>

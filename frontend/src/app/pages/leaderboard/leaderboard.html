@@ -1,0 +1,319 @@
+<div class="sl-root">
+
+  <!-- MARCADOR EN VIVO -->
+  @if (currentMatch) {
+    <div class="match-banner" [class.is-live]="isLive(currentMatch)">
+      <div class="banner-stripe"></div>
+
+      @if (isLive(currentMatch)) {
+        <div class="match-phase">
+          <span class="pulsing-badge">EN VIVO</span>
+        </div>
+      }
+
+      <div class="match-scoreboard">
+        <div class="team-block home">
+          @if (getFlagUrl(currentMatch.home_team)) {
+            <img class="team-flag-img" [src]="getFlagUrl(currentMatch.home_team)" [alt]="currentMatch.home_team" />
+          }
+          <span class="team-name">{{ currentMatch.home_team }}</span>
+        </div>
+
+        <div class="score-center">
+          <div class="score-row">
+            @if (currentMatch.home_score !== null && currentMatch.away_score !== null) {
+              <span class="score-num">{{ currentMatch.home_score }}</span>
+              <span class="score-sep">-</span>
+              <span class="score-num">{{ currentMatch.away_score }}</span>
+            } @else {
+              <span class="score-vs">VS</span>
+            }
+          </div>
+          @if (isLive(currentMatch)) {
+            @if (currentMatch.period === 'HT') {
+              <div class="match-minute halftime">⏸ MEDIO TIEMPO</div>
+            } @else if (getESPNClock(currentMatch)) {
+              <div class="match-minute">⏱ {{ getESPNClock(currentMatch) }}</div>
+            } @else {
+              <div class="match-minute">● EN VIVO</div>
+            }
+          } @else if (isPending(currentMatch)) {
+            <div class="match-kickoff">{{ formatMatchTime(currentMatch) }}</div>
+          }
+        </div>
+
+        <div class="team-block away">
+          @if (getFlagUrl(currentMatch.away_team)) {
+            <img class="team-flag-img" [src]="getFlagUrl(currentMatch.away_team)" [alt]="currentMatch.away_team" />
+          }
+          <span class="team-name">{{ currentMatch.away_team }}</span>
+        </div>
+      </div>
+
+      @if (liveMatches.length > 1) {
+        <div class="match-dots">
+          @for (m of liveMatches; track m.id; let i = $index) {
+            <span class="dot-nav" [class.active]="i === currentMatchIdx"></span>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- TABS PRINCIPALES -->
+  <div class="main-tabs">
+    <button class="main-tab" [class.active]="activeView === 'leaderboard'" (click)="switchView('leaderboard')">
+      🏆 Clasificación
+    </button>
+    <button class="main-tab" [class.active]="activeView === 'mundial'" (click)="switchView('mundial')">
+      🌍 Mundial
+    </button>
+  </div>
+
+  <!-- SECCIÓN MUNDIAL -->
+  @if (activeView === 'mundial') {
+    <div class="mundial-wrapper">
+      <div class="mundial-subtabs">
+        <button [class.active]="mundialTab === 'standings'" (click)="mundialTab = 'standings'">Grupos</button>
+        <button [class.active]="mundialTab === 'results'" (click)="mundialTab = 'results'">Resultados</button>
+        <button [class.active]="mundialTab === 'events'" (click)="mundialTab = 'events'">Goles y Tarjetas</button>
+      </div>
+
+      @if (wcLoading) {
+        <div class="wc-loading">Cargando datos del Mundial...</div>
+      }
+
+      <!-- TABLA DE GRUPOS -->
+      @if (mundialTab === 'standings' && !wcLoading) {
+        <div class="group-selector">
+          @for (g of groupNames; track g) {
+            <button class="grp-btn" [class.active]="g === selectedGroup" (click)="selectedGroup = g">
+              {{ g.replace('Group ', '') }}
+            </button>
+          }
+        </div>
+
+        <div class="standings-table">
+          <div class="st-header">
+            <span class="st-pos">#</span>
+            <span class="st-team">Equipo</span>
+            <span class="st-stat">PJ</span>
+            <span class="st-stat">G</span>
+            <span class="st-stat">E</span>
+            <span class="st-stat">P</span>
+            <span class="st-stat">GD</span>
+            <span class="st-pts">PTS</span>
+          </div>
+          @for (row of currentGroupStandings; track row.team) {
+            <div class="st-row" [class.qualify]="row.position <= 2">
+              <span class="st-pos">{{ row.position }}</span>
+              <span class="st-team">
+                <img class="mini-flag" [src]="getFlagFromCrest(row.crest, row.team)" [alt]="row.tla" onerror="this.style.display='none'" />
+                <span class="st-tla">{{ row.tla }}</span>
+                <span class="st-name">{{ row.team }}</span>
+              </span>
+              <span class="st-stat">{{ row.played }}</span>
+              <span class="st-stat">{{ row.won }}</span>
+              <span class="st-stat">{{ row.draw }}</span>
+              <span class="st-stat">{{ row.lost }}</span>
+              <span class="st-stat" [class.positive]="row.gd > 0" [class.negative]="row.gd < 0">
+                {{ row.gd > 0 ? '+' : '' }}{{ row.gd }}
+              </span>
+              <span class="st-pts">{{ row.points }}</span>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- GOLES Y TARJETAS (ESPN) -->
+      @if (mundialTab === 'events') {
+        <div class="espn-nav">
+          <button (click)="loadESPNDate(-1)">‹</button>
+          <span>{{ formatESPNDate() }}</span>
+          <button (click)="loadESPNDate(1)">›</button>
+        </div>
+
+        @if (espnEvents.length === 0) {
+          <div class="wc-loading">No hay partidos este día</div>
+        }
+
+        @for (ev of espnEvents; track ev.espnId) {
+          <div class="espn-match">
+            <div class="espn-header">
+              <div class="espn-teams">
+                <img class="mini-flag" [src]="ev.homeLogo" [alt]="ev.home" onerror="this.style.display='none'" />
+                <span>{{ ev.home }}</span>
+                <span class="espn-score">{{ ev.homeScore }} – {{ ev.awayScore }}</span>
+                <span>{{ ev.away }}</span>
+                <img class="mini-flag" [src]="ev.awayLogo" [alt]="ev.away" onerror="this.style.display='none'" />
+              </div>
+              @if (ev.status === 'live') {
+                <span class="espn-clock live">
+                  {{ ev.period === 'HT' ? 'MT' : ev.clock }}
+                </span>
+              } @else if (ev.status === 'finished') {
+                <span class="espn-clock fin">FIN</span>
+              }
+            </div>
+
+            @if (ev.goals.length > 0) {
+              <div class="espn-events">
+                @for (g of ev.goals; track g.minute + g.scorer) {
+                  <div class="ev-row goal" [class.home]="g.team === 'home'" [class.away]="g.team === 'away'">
+                    <span class="ev-icon">{{ g.ownGoal ? '⚽🔴' : g.penalty ? '⚽(P)' : '⚽' }}</span>
+                    <span class="ev-min">{{ g.minute }}'</span>
+                    <span class="ev-player">{{ g.scorer }}</span>
+                    <span class="ev-side">{{ g.team === 'home' ? ev.home : ev.away }}</span>
+                  </div>
+                }
+              </div>
+            }
+
+            @if (ev.cards.length > 0) {
+              <div class="espn-events cards">
+                @for (c of ev.cards; track c.minute + c.player) {
+                  <div class="ev-row">
+                    <span class="ev-icon">{{ c.red ? '🟥' : '🟨' }}</span>
+                    <span class="ev-min">{{ c.minute }}'</span>
+                    <span class="ev-player">{{ c.player }}</span>
+                    <span class="ev-side">{{ c.team === 'home' ? ev.home : ev.away }}</span>
+                  </div>
+                }
+              </div>
+            }
+
+            @if (ev.goals.length === 0 && ev.cards.length === 0) {
+              <div class="ev-empty">Sin eventos registrados</div>
+            }
+          </div>
+        }
+      }
+
+      <!-- RESULTADOS RECIENTES -->
+      @if (mundialTab === 'results' && !wcLoading) {
+        <div class="results-list">
+          @for (r of wcResults; track r.id) {
+            <div class="result-row">
+              <span class="res-date">{{ formatResultDate(r.date) }}<br>{{ formatResultTime(r.date) }}</span>
+              <div class="res-match">
+                <div class="res-team home">
+                  <img class="mini-flag" [src]="getFlagFromCrest(r.homeCrest, r.home)" [alt]="r.home" onerror="this.style.display='none'" />
+                  <span>{{ r.home }}</span>
+                </div>
+                <div class="res-score">{{ r.homeScore }} – {{ r.awayScore }}</div>
+                <div class="res-team away">
+                  <span>{{ r.away }}</span>
+                  <img class="mini-flag" [src]="getFlagFromCrest(r.awayCrest, r.away)" [alt]="r.away" onerror="this.style.display='none'" />
+                </div>
+              </div>
+              <span class="res-group">{{ r.group }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- PODIO DE CLASIFICACIÓN -->
+  @if (activeView === 'leaderboard') {
+  <div class="podium-wrapper">
+
+    <!-- Confeti animado -->
+    <div class="confetti-stage" aria-hidden="true">
+      @for (c of confetti; track c) {
+        <div class="cf-piece"></div>
+      }
+    </div>
+
+    @if (entries.length === 0) {
+      <div class="lb-empty">Cargando clasificación...</div>
+    }
+
+    <!-- TOP 3 PODIO -->
+    @if (entries.length > 0) {
+    <div class="podium-stage">
+
+      <!-- 2do lugar (izquierda) -->
+      <div class="podium-col">
+        @if (entries.length >= 2) {
+          <div class="pc-wrap">
+            <div class="pc-head av-silver">{{ getPosEmoji(2) }}</div>
+            <div class="pc-body silver-body"></div>
+            <div class="pc-legs silver-legs">
+              <div class="pc-leg"></div>
+              <div class="pc-leg"></div>
+            </div>
+          </div>
+          <div class="ps-name">{{ entries[1].user_name }}</div>
+          <div class="ps-pts">{{ entries[1].total_points }}<span class="pts-lbl">pts</span></div>
+          @if (entries[1].trend === 'up') { <span class="trend-chip up">▲</span> }
+          @else if (entries[1].trend === 'down') { <span class="trend-chip down">▼</span> }
+        }
+        <div class="ps-block block-silver">@if(entries.length >= 2){🥈}</div>
+      </div>
+
+      <!-- 1er lugar (centro, más alto) -->
+      <div class="podium-col gold-col">
+        <img class="podium-trophy" src="https://crests.football-data.org/wm26.png" alt="Copa" />
+        <div class="pc-wrap">
+          <div class="pc-head av-gold">{{ getPosEmoji(1) }}</div>
+          <div class="pc-body gold-body"></div>
+          <div class="pc-legs gold-legs">
+            <div class="pc-leg"></div>
+            <div class="pc-leg"></div>
+          </div>
+        </div>
+        <div class="ps-name leader-name">{{ entries[0].user_name }}</div>
+        <div class="ps-pts leader-pts">{{ entries[0].total_points }}<span class="pts-lbl">pts</span></div>
+        @if (entries[0].trend === 'up') { <span class="trend-chip up">▲</span> }
+        @else if (entries[0].trend === 'down') { <span class="trend-chip down">▼</span> }
+        <div class="ps-block block-gold">🥇</div>
+      </div>
+
+      <!-- 3er lugar (derecha) -->
+      <div class="podium-col">
+        @if (entries.length >= 3) {
+          <div class="pc-wrap">
+            <div class="pc-head av-bronze">{{ getPosEmoji(3) }}</div>
+            <div class="pc-body bronze-body"></div>
+            <div class="pc-legs bronze-legs">
+              <div class="pc-leg"></div>
+              <div class="pc-leg"></div>
+            </div>
+          </div>
+          <div class="ps-name">{{ entries[2].user_name }}</div>
+          <div class="ps-pts">{{ entries[2].total_points }}<span class="pts-lbl">pts</span></div>
+          @if (entries[2].trend === 'up') { <span class="trend-chip up">▲</span> }
+          @else if (entries[2].trend === 'down') { <span class="trend-chip down">▼</span> }
+        }
+        <div class="ps-block block-bronze">@if(entries.length >= 3){🥉}</div>
+      </div>
+
+    </div>
+    }
+
+    <!-- LISTA 4+ -->
+    @if (entries.length > 3) {
+    <div class="rest-list">
+      @for (entry of entries.slice(3); track trackById($index, entry)) {
+        <div class="rest-row">
+          <span class="rest-pos">{{ entry.position }}</span>
+          <div class="rest-avatar">{{ getPosEmoji(entry.position ?? 99) }}</div>
+          <span class="rest-name">{{ entry.user_name }}</span>
+          <span class="rest-pts">{{ entry.total_points }} pts</span>
+          @if (entry.trend === 'up') {
+            <span class="trend-chip up">▲{{ entry.trendDelta && entry.trendDelta > 0 ? entry.trendDelta : '' }}</span>
+          } @else if (entry.trend === 'down') {
+            <span class="trend-chip down">▼{{ entry.trendDelta && entry.trendDelta > 0 ? entry.trendDelta : '' }}</span>
+          } @else {
+            <span class="trend-chip same">–</span>
+          }
+        </div>
+      }
+    </div>
+    }
+
+  </div>
+  } <!-- end leaderboard view -->
+
+</div>

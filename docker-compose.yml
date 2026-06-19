@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16
+    container_name: scorelive-db
+    environment:
+      POSTGRES_DB: scorelive
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: scorelive123
+    ports:
+      - "5432:5432"
+    volumes:
+      - scorelive_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+volumes:
+  scorelive_data:
