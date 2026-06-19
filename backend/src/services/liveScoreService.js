@@ -61,6 +61,10 @@ async function pollLiveMatches(io) {
       }
       if (statusChanged) {
         console.log(`[STATUS] ${match.home_team} vs ${match.away_team}: ${match.status} → ${espn.status}`);
+        if (espn.status === 'finished') {
+          console.log(`[FIN] Recalculando puntos para ${match.home_team} vs ${match.away_team}`);
+          await recalculateMatch(match.id, io);
+        }
       }
 
       io.emit('match_update', {
