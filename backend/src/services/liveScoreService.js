@@ -57,14 +57,14 @@ async function pollLiveMatches(io) {
 
       if (scoreChanged) {
         console.log(`[GOL] ${match.home_team} ${homeScore}-${awayScore} ${match.away_team} (${espn.clock})`);
-        await recalculateMatch(match.id, io);
       }
       if (statusChanged) {
         console.log(`[STATUS] ${match.home_team} vs ${match.away_team}: ${match.status} → ${espn.status}`);
-        if (espn.status === 'finished') {
-          console.log(`[FIN] Recalculando puntos para ${match.home_team} vs ${match.away_team}`);
-          await recalculateMatch(match.id, io);
-        }
+      }
+
+      // Recalcular en cada poll mientras hay marcador (live o finished)
+      if (homeScore !== null && awayScore !== null) {
+        await recalculateMatch(match.id, io);
       }
 
       io.emit('match_update', {
