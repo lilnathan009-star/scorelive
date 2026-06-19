@@ -245,7 +245,7 @@ export class Leaderboard implements OnInit, OnDestroy {
   pollESPNClock() {
     this.http.get<any[]>('/api/espn/scoreboard').subscribe({
       next: events => {
-        const map: Record<string, string> = {};
+        const map: Record<string, string> = { ...this.espnClockMap };
         for (const ev of events) {
           if (ev.status === 'live') {
             const key = `${ev.home}|${ev.away}`;
@@ -255,7 +255,7 @@ export class Leaderboard implements OnInit, OnDestroy {
         this.espnClockMap = map;
         this.cdr.detectChanges();
       },
-      error: () => {}
+      error: () => {} // mantiene el último valor conocido
     });
   }
 

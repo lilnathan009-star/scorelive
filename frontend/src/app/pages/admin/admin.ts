@@ -136,13 +136,11 @@ export class Admin implements OnInit {
   }
 
   useFootballMatch(m: any) {
-    const utc = new Date(m.date);
-    const local = new Date(utc.getTime() - utc.getTimezoneOffset() * 60000)
-      .toISOString().slice(0, 16);
+    // Enviar la hora UTC directamente — el backend la guarda como UTC y el frontend la convierte a Ecuador
     this.newMatch = {
       home_team: m.home,
       away_team: m.away,
-      match_date: local,
+      match_date: new Date(m.date).toISOString().slice(0, 16),
       phase: 'group',
       api_match_id: String(m.espnId)
     };
