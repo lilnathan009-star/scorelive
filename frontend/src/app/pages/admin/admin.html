@@ -90,7 +90,7 @@
             <option value="final">Final</option>
           </select>
         </div>
-        <button (click)="createMatch()">Crear partido</button>
+        <button (click)="createMatch()" [disabled]="isCreating">{{ isCreating ? 'Creando...' : 'Crear partido' }}</button>
       </section>
 
       <section class="card">

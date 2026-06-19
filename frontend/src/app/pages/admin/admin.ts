@@ -77,16 +77,24 @@ export class Admin implements OnInit {
     this.api.getMatches(id).subscribe(m => this.matches = m);
   }
 
+  isCreating = false;
+
   createMatch() {
+    if (this.isCreating) return;
     if (!this.selectedTournamentId) { this.notify('Selecciona un torneo primero', 'error'); return; }
     if (!this.newMatch.home_team || !this.newMatch.away_team) { this.notify('Faltan nombres de equipos', 'error'); return; }
+    this.isCreating = true;
     this.api.createMatch({ ...this.newMatch, tournament_id: this.selectedTournamentId }).subscribe({
       next: m => {
         this.matches.push(m);
         this.newMatch = { home_team: '', away_team: '', match_date: '', phase: 'group', api_match_id: '' };
         this.notify('Partido creado');
+        this.isCreating = false;
       },
-      error: err => this.notify(err.error?.error || 'Error al crear partido', 'error')
+      error: err => {
+        this.notify(err.error?.error || 'Error al crear partido', 'error');
+        this.isCreating = false;
+      }
     });
   }
 
