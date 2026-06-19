@@ -135,9 +135,9 @@ export class Leaderboard implements OnInit, OnDestroy {
     this.cargarPartidosVivos();
     this.matchPollInterval = setInterval(() => this.cargarPartidosVivos(), 30000);
 
-    // ESPN clock poll cada 30s (sin límite de requests)
+    // ESPN clock poll cada 15s (sin límite de requests)
     this.pollESPNClock();
-    this.espnInterval = setInterval(() => this.pollESPNClock(), 30000);
+    this.espnInterval = setInterval(() => this.pollESPNClock(), 15000);
   }
 
   startRotation() {
