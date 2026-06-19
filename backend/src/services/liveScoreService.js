@@ -41,6 +41,9 @@ async function pollLiveMatches(io) {
 
       if (!espn) continue; // partido no está en el scoreboard de hoy
 
+      // Nunca revertir live → pending (puede ser un blip de la API de ESPN)
+      if (match.status === 'live' && espn.status === 'pending') continue;
+
       const homeScore = espn.homeScore ?? match.home_score;
       const awayScore = espn.awayScore ?? match.away_score;
       const scoreChanged = homeScore !== match.home_score || awayScore !== match.away_score;

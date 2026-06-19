@@ -18,9 +18,15 @@ async function espnFetch(path) {
 }
 
 function mapStatus(name) {
-  if (name === 'STATUS_IN_PROGRESS') return 'live';
-  if (name === 'STATUS_HALFTIME')    return 'live';
-  if (name === 'STATUS_FULL_TIME' || name === 'STATUS_FINAL') return 'finished';
+  if (name === 'STATUS_IN_PROGRESS')    return 'live';
+  if (name === 'STATUS_HALFTIME')       return 'live';
+  if (name === 'STATUS_END_OF_PERIOD')  return 'live';
+  if (name === 'STATUS_SECOND_HALF')    return 'live';
+  if (name === 'STATUS_EXTRA_TIME')     return 'live';
+  if (name === 'STATUS_OVERTIME')       return 'live';
+  if (name === 'STATUS_PENALTY')        return 'live';
+  if (name === 'STATUS_FULL_TIME' || name === 'STATUS_FINAL' ||
+      name === 'STATUS_FINAL_AET'  || name === 'STATUS_FINAL_PEN') return 'finished';
   return 'pending';
 }
 
