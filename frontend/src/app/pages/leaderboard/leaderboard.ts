@@ -142,6 +142,13 @@ export class Leaderboard implements OnInit, OnDestroy {
 
   startRotation() {
     clearInterval(this.rotateInterval);
+    const liveIdx = this.liveMatches.findIndex(m => m.status === 'live');
+    if (liveIdx >= 0) {
+      // Hay partido en vivo → quedarse fijo en él, no rotar
+      this.currentMatchIdx = liveIdx;
+      return;
+    }
+    // Sin partidos en vivo → rotar entre los pending
     if (this.liveMatches.length > 1) {
       this.rotateInterval = setInterval(() => {
         this.currentMatchIdx = (this.currentMatchIdx + 1) % this.liveMatches.length;
@@ -151,6 +158,9 @@ export class Leaderboard implements OnInit, OnDestroy {
   }
 
   get currentMatch(): LiveMatch | null {
+    // Siempre priorizar el partido en vivo
+    const live = this.liveMatches.find(m => m.status === 'live');
+    if (live) return live;
     return this.liveMatches[this.currentMatchIdx] ?? null;
   }
 
