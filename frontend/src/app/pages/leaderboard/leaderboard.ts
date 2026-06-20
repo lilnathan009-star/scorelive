@@ -33,6 +33,7 @@ const TEAM_ISO: Record<string, string> = {
   'South Korea': 'kr', 'Korea Republic': 'kr', 'Corea del Sur': 'kr',
   'Japan': 'jp', 'Japón': 'jp', 'Australia': 'au',
   'Saudi Arabia': 'sa', 'Arabia Saudí': 'sa', 'Iran': 'ir',
+  'Curaçao': 'cw', 'Curacao': 'cw',
   'Qatar': 'qa', 'China': 'cn', 'Indonesia': 'id', 'Iraq': 'iq',
   'Jordan': 'jo', 'Jordania': 'jo', 'Uzbekistan': 'uz', 'Uzbekistán': 'uz',
 };
