@@ -128,6 +128,15 @@ export class Leaderboard implements OnInit, OnDestroy {
             this.liveMatches[idx] = { ...this.liveMatches[idx], ...match };
           }
         }
+        // Actualizar referencia del modal si el partido que cambió es el que está abierto
+        if (this.predModalMatch && this.predModalMatch.id === match.id) {
+          this.predModalMatch = { ...this.predModalMatch, ...match };
+          // Recargar pronósticos para que los puntos se actualicen
+          this.http.get<any[]>(`/api/predictions/match/${match.id}`).subscribe({
+            next: data => { this.predModalPreds = data; this.cdr.detectChanges(); },
+            error: () => {}
+          });
+        }
         this.cdr.detectChanges();
       })
     );
