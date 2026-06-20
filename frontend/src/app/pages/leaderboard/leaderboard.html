@@ -2,7 +2,7 @@
 
   <!-- MARCADOR EN VIVO -->
   @if (currentMatch) {
-    <div class="match-banner" [class.is-live]="isLive(currentMatch)">
+    <div class="match-banner" [class.is-live]="isLive(currentMatch)" (click)="openPredModal(currentMatch)">
       <div class="banner-stripe"></div>
 
       @if (isLive(currentMatch)) {
@@ -329,5 +329,41 @@
 
   </div>
   } <!-- end leaderboard view -->
+
+  <!-- MODAL PRONÓSTICOS -->
+  @if (showPredModal) {
+    <div class="pred-overlay" (click)="closePredModal()">
+      <div class="pred-modal" (click)="$event.stopPropagation()">
+        <div class="pred-modal-header">
+          <div class="pred-modal-titles">
+            <span class="pred-modal-label">Pronósticos</span>
+            <span class="pred-modal-match">{{ predModalTitle }}</span>
+          </div>
+          <button class="pred-close" (click)="closePredModal()">✕</button>
+        </div>
+
+        @if (predModalLoading) {
+          <div class="pred-state">Cargando...</div>
+        } @else if (predModalPreds.length === 0) {
+          <div class="pred-state">Aún no hay pronósticos disponibles</div>
+        } @else {
+          <div class="pred-list">
+            @for (p of predModalPreds; track p.user_name) {
+              <div class="pred-row" [class.exact]="p.points === 8">
+                <div class="pred-avatar">{{ (p.initials || p.user_name)[0] }}</div>
+                <span class="pred-name">{{ p.user_name }}</span>
+                <span class="pred-score-pred">{{ p.home_score }} – {{ p.away_score }}</span>
+                @if (predModalMatch && predModalMatch.home_score !== null) {
+                  <span class="pred-pts" [class.pts-exact]="p.points === 8" [class.pts-zero]="p.points === 0">
+                    {{ p.points > 0 ? '+' + p.points : '0' }} pts
+                  </span>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
 
 </div>

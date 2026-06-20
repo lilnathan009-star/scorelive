@@ -421,6 +421,31 @@ export class Leaderboard implements OnInit, OnDestroy {
 
   trackById(_: number, e: LeaderboardEntry) { return e.user_id; }
 
+  // Modal pronósticos
+  showPredModal = false;
+  predModalTitle = '';
+  predModalMatch: LiveMatch | null = null;
+  predModalPreds: any[] = [];
+  predModalLoading = false;
+
+  openPredModal(match: LiveMatch | null) {
+    if (!match) return;
+    this.predModalMatch = match;
+    this.predModalTitle = `${match.home_team} vs ${match.away_team}`;
+    this.predModalPreds = [];
+    this.predModalLoading = true;
+    this.showPredModal = true;
+    this.http.get<any[]>(`/api/predictions/match/${match.id}`).subscribe({
+      next: data => { this.predModalPreds = data; this.predModalLoading = false; this.cdr.detectChanges(); },
+      error: () => { this.predModalLoading = false; this.cdr.detectChanges(); }
+    });
+  }
+
+  closePredModal() {
+    this.showPredModal = false;
+    this.predModalMatch = null;
+  }
+
   ngOnDestroy() {
     this.subs.forEach(s => s.unsubscribe());
     clearInterval(this.pollInterval);
