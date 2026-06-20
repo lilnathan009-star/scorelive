@@ -29,30 +29,53 @@ async function pollLiveMatches(io) {
     // ESPN: 1 request trae todos los partidos del Mundial con score, reloj y estado
     const espnEvents = await fetchWCScoreboard();
 
-    // Mapa por nombre de equipos (ya normalizados en espnService)
+    if (espnEvents.length === 0) {
+      console.log('[ESPN] scoreboard vacío');
+    } else {
+      console.log(`[ESPN] ${espnEvents.length} partidos: ${espnEvents.map(e => `${e.home} vs ${e.away} [${e.status}] ${e.homeScore ?? '-'}-${e.awayScore ?? '-'}`).join(' | ')}`);
+    }
+
+    // Mapa por nombre de equipos y por ESPN ID
     const espnMap = {};
+    const espnIdMap = {};
     for (const ev of espnEvents) {
       espnMap[`${ev.home}|${ev.away}`] = ev;
+      espnIdMap[String(ev.espnId)] = ev;
     }
 
     for (const match of matches) {
-      const key = `${match.home_team}|${match.away_team}`;
-      const espn = espnMap[key];
+      // Buscar por ESPN ID primero (más confiable), luego por nombre
+      let espn = match.api_match_id ? espnIdMap[String(match.api_match_id)] : null;
+      if (!espn) {
+        const key = `${match.home_team}|${match.away_team}`;
+        espn = espnMap[key];
+      }
 
-      if (!espn) continue; // partido no está en el scoreboard de hoy
-
-      // Nunca revertir live → pending (puede ser un blip de la API de ESPN)
-      if (match.status === 'live' && espn.status === 'pending') continue;
+      if (!espn) {
+        console.log(`[ESPN] No encontrado: "${match.home_team} vs ${match.away_team}" (api_id=${match.api_match_id})`);
+        continue; // partido no está en el scoreboard de hoy
+      }
 
       const homeScore = espn.homeScore ?? match.home_score;
       const awayScore = espn.awayScore ?? match.away_score;
       const scoreChanged = homeScore !== match.home_score || awayScore !== match.away_score;
-      const statusChanged = espn.status !== match.status;
       const minute = parseMinute(espn.clock);
+
+      // Si ESPN devuelve score pero status desconocido (pending), tratar como live
+      let newStatus = espn.status;
+      if (newStatus === 'pending' && (homeScore > 0 || awayScore > 0)) {
+        newStatus = 'live';
+      }
+      // Nunca revertir live → pending (puede ser un blip de la API de ESPN)
+      if (match.status === 'live' && newStatus === 'pending') {
+        newStatus = 'live';
+      }
+
+      const statusChanged = newStatus !== match.status;
 
       await pool.query(
         `UPDATE matches SET home_score=$1, away_score=$2, status=$3, current_minute=$4 WHERE id=$5`,
-        [homeScore, awayScore, espn.status, minute, match.id]
+        [homeScore, awayScore, newStatus, minute, match.id]
       );
 
       if (scoreChanged) {
@@ -73,7 +96,7 @@ async function pollLiveMatches(io) {
         away_team: match.away_team,
         home_score: homeScore,
         away_score: awayScore,
-        status: espn.status,
+        status: newStatus,
         minute,
         clock: espn.clock,
         period: espn.period,
