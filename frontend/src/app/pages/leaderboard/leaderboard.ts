@@ -249,9 +249,11 @@ export class Leaderboard implements OnInit, OnDestroy {
         const clockMap: Record<string, string> = { ...this.espnClockMap };
         const goalsMap: Record<string, {home: any[], away: any[]}> = { ...this.espnGoalsMap };
         for (const ev of events) {
-          if (ev.status === 'live' || ev.status === 'finished') {
+          const hasScore = (ev.homeScore ?? 0) > 0 || (ev.awayScore ?? 0) > 0;
+          const isActive = ev.status === 'live' || (ev.status === 'pending' && hasScore);
+          if (isActive || ev.status === 'finished') {
             const key = `${ev.home}|${ev.away}`;
-            if (ev.status === 'live') {
+            if (isActive) {
               clockMap[key] = ev.period === 'HT' ? 'MT' : (ev.clock ?? '');
             }
             if (ev.goals?.length > 0) {
