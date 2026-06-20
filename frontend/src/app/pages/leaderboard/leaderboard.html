@@ -311,17 +311,19 @@
     <div class="rest-list">
       @for (entry of entries.slice(3); track trackById($index, entry)) {
         <div class="rest-row">
-          <span class="rest-pos">{{ entry.position }}</span>
+          <div class="rest-pos-block">
+            <span class="rest-pos">{{ entry.position }}</span>
+            @if (entry.trend === 'up') {
+              <span class="trend-arrow up">↑</span>
+            } @else if (entry.trend === 'down') {
+              <span class="trend-arrow down">↓</span>
+            } @else {
+              <span class="trend-arrow same">=</span>
+            }
+          </div>
           <div class="rest-avatar">{{ getPosEmoji(entry.position ?? 99) }}</div>
           <span class="rest-name">{{ entry.user_name }}</span>
           <span class="rest-pts">{{ entry.total_points }} pts</span>
-          @if (entry.trend === 'up') {
-            <span class="trend-chip up">▲{{ entry.trendDelta && entry.trendDelta > 0 ? entry.trendDelta : '' }}</span>
-          } @else if (entry.trend === 'down') {
-            <span class="trend-chip down">▼{{ entry.trendDelta && entry.trendDelta > 0 ? entry.trendDelta : '' }}</span>
-          } @else {
-            <span class="trend-chip same">–</span>
-          }
         </div>
       }
     </div>
