@@ -35,6 +35,7 @@ export class Admin implements OnInit {
   predJson = '';
   users: any[] = [];
   manualPred = { user_id: null as number|null, home_score: null as number|null, away_score: null as number|null };
+  matchPreds: any[] = [];
 
   // Grupos
   groupResultData = { group_name: '', team1: '', team2: '', third_team: '' };
@@ -166,6 +167,25 @@ export class Admin implements OnInit {
     } catch {
       this.notify('JSON inválido', 'error');
     }
+  }
+
+  onPredMatchSelected(matchId: number | null) {
+    this.matchPreds = [];
+    this.manualPred = { user_id: null, home_score: null, away_score: null };
+    if (!matchId) return;
+    this.api.getMatchPredictions(matchId).subscribe(preds => {
+      this.matchPreds = preds;
+      this.cdr.detectChanges();
+    });
+  }
+
+  onUserSelected(userId: number | null) {
+    if (!userId) { this.manualPred.home_score = null; this.manualPred.away_score = null; return; }
+    const user = this.users.find((u: any) => u.id === userId);
+    const existing = user ? this.matchPreds.find((p: any) => p.user_name === user.user_name) : null;
+    this.manualPred.home_score = existing ? existing.home_score : null;
+    this.manualPred.away_score = existing ? existing.away_score : null;
+    this.cdr.detectChanges();
   }
 
   addManualPrediction() {

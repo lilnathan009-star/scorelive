@@ -139,7 +139,7 @@
           <div class="form-grid-1 match-selector">
             <div class="field">
               <label>Partido</label>
-              <select [(ngModel)]="selectedMatchId">
+              <select [(ngModel)]="selectedMatchId" (ngModelChange)="onPredMatchSelected($event)">
                 <option [ngValue]="null">— Seleccionar partido —</option>
                 @for (m of matches; track m.id) {
                   <option [ngValue]="m.id">{{ m.home_team }} vs {{ m.away_team }}</option>
@@ -161,7 +161,7 @@
             <div class="form-grid-2">
               <div class="field">
                 <label>Participante</label>
-                <select [(ngModel)]="manualPred.user_id">
+                <select [(ngModel)]="manualPred.user_id" (ngModelChange)="onUserSelected($event)">
                   <option [ngValue]="null">— Seleccionar —</option>
                   @for (u of users; track u.id) {
                     <option [ngValue]="u.id">{{ u.user_name }}</option>
