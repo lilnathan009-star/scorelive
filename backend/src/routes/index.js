@@ -94,6 +94,98 @@ router.get('/espn/scoreboard', async (req, res) => {
   }
 });
 
+// --- Datos para chismes (partidos recientes + pronósticos) ---
+router.get('/gossip-data', async (req, res) => {
+  const pool = require('../config/db');
+  try {
+    const { rows: matches } = await pool.query(`
+      SELECT id, home_team, away_team, home_score, away_score, status
+      FROM matches
+      WHERE status IN ('finished', 'live')
+      ORDER BY match_date DESC
+      LIMIT 5
+    `);
+
+    if (!matches.length) return res.json([]);
+
+    const result = [];
+    for (const m of matches) {
+      const { rows: preds } = await pool.query(`
+        SELECT u.user_name, mp.home_score AS pred_home, mp.away_score AS pred_away, mp.points
+        FROM match_predictions mp
+        JOIN users u ON u.id = mp.user_id
+        WHERE mp.match_id = $1
+      `, [m.id]);
+      result.push({ ...m, predictions: preds });
+    }
+
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// --- Stats del torneo ---
+router.get('/stats', async (req, res) => {
+  const pool = require('../config/db');
+  try {
+    const { rows: [r] } = await pool.query(`
+      SELECT
+        COUNT(*) as total_predictions,
+        COALESCE(AVG(CASE WHEN mp.points > 0 THEN 100.0 ELSE 0.0 END), 0) as accuracy
+      FROM match_predictions mp
+      JOIN matches m ON m.id = mp.match_id
+      WHERE m.status = 'finished'
+    `);
+    res.json({
+      predictions: parseInt(r.total_predictions) || 0,
+      accuracy: Math.round(parseFloat(r.accuracy) || 0)
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// --- Chismes del Mundial (Claude AI) ---
+router.get('/gossip', async (req, res) => {
+  const pool = require('../config/db');
+  try {
+    const { rows } = await pool.query(`
+      SELECT user_name, total_points, position
+      FROM leaderboard
+      ORDER BY position ASC
+      LIMIT 10
+    `);
+    if (!rows.length) return res.json([]);
+
+    const Anthropic = require('@anthropic-ai/sdk');
+    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+    const top = rows.slice(0, 5).map(r => `#${r.position} ${r.user_name}: ${r.total_points}pts`).join(', ');
+    const last = rows[rows.length - 1];
+
+    const msg = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 300,
+      messages: [{
+        role: 'user',
+        content: `Eres el comentarista gracioso e irónico de un torneo de predicciones del Mundial entre amigos.
+Top del leaderboard: ${top}. Último lugar: ${last.user_name} con ${last.total_points}pts.
+Genera exactamente 3 "chismes" cortos, divertidos y variados en español sobre estos jugadores (max 15 palabras cada uno).
+Sé creativo, usa humor, pueden ser provocadores pero amistosos.
+Responde ÚNICAMENTE con JSON válido en este formato exacto, sin texto adicional:
+[{"emoji":"🔥","text":"..."},{"emoji":"😬","text":"..."},{"emoji":"👑","text":"..."}]`
+      }]
+    });
+
+    const gossip = JSON.parse(msg.content[0].text);
+    res.json(gossip);
+  } catch (err) {
+    console.error('[Gossip]', err.message);
+    res.json([]);
+  }
+});
+
 // --- Simulación (solo para pruebas) ---
 const { startSimulation, stopSimulation } = require('../services/simulationService');
 

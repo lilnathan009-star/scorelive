@@ -1,7 +1,7 @@
 <div class="sl-root">
 
   <!-- MARCADOR EN VIVO -->
-  @if (currentMatch) {
+  @if (currentMatch && activeView !== 'leaderboard') {
     <div class="match-banner" [class.is-live]="isLive(currentMatch)" (click)="openPredModal(currentMatch)">
       <div class="banner-stripe"></div>
 
@@ -228,106 +228,229 @@
     </div>
   }
 
-  <!-- PODIO DE CLASIFICACIÓN -->
+  <!-- LEADERBOARD VIEW -->
   @if (activeView === 'leaderboard') {
-  <div class="podium-wrapper">
+  <div class="lb-grid">
 
-    <!-- Confeti animado -->
+    <!-- Confeti -->
     <div class="confetti-stage" aria-hidden="true">
-      @for (c of confetti; track c) {
-        <div class="cf-piece"></div>
+      @for (c of confetti; track c) { <div class="cf-piece"></div> }
+    </div>
+
+    <!-- ══ COLUMNA PRINCIPAL ══ -->
+    <div class="lb-main">
+
+      @if (entries.length === 0) {
+        <div class="lb-empty">Cargando clasificación...</div>
       }
-    </div>
 
-    @if (entries.length === 0) {
-      <div class="lb-empty">Cargando clasificación...</div>
-    }
+      <!-- TOP 3 -->
+      @if (entries.length > 0) {
+      <div class="top3-card">
+        <div class="top3-header">🏆 TOP 3</div>
+        <div class="podium-stage">
 
-    <!-- TOP 3 PODIO -->
-    @if (entries.length > 0) {
-    <div class="podium-stage">
+          <div class="podium-col">
+            @if (entries.length >= 2) {
+              <div class="pc-wrap">
+                <div class="pc-head av-silver">{{ getPosEmoji(2) }}</div>
+                <div class="pc-body silver-body"></div>
+                <div class="pc-legs silver-legs"><div class="pc-leg"></div><div class="pc-leg"></div></div>
+              </div>
+              <div class="ps-name">{{ entries[1].user_name.split(' ')[0] }}</div>
+              <div class="ps-pts">{{ entries[1].total_points }}<span class="pts-lbl">pts</span></div>
+              @if (entries[1].trend === 'up') { <span class="trend-chip up">▲</span> }
+              @else if (entries[1].trend === 'down') { <span class="trend-chip down">▼</span> }
+            }
+            <div class="ps-block block-silver">@if(entries.length >= 2){🥈}</div>
+          </div>
 
-      <!-- 2do lugar (izquierda) -->
-      <div class="podium-col">
-        @if (entries.length >= 2) {
-          <div class="pc-wrap">
-            <div class="pc-head av-silver">{{ getPosEmoji(2) }}</div>
-            <div class="pc-body silver-body"></div>
-            <div class="pc-legs silver-legs">
-              <div class="pc-leg"></div>
-              <div class="pc-leg"></div>
+          <div class="podium-col gold-col">
+            <img class="podium-trophy" src="https://crests.football-data.org/wm26.png" alt="Copa" />
+            <div class="pc-wrap">
+              <div class="pc-head av-gold">{{ getPosEmoji(1) }}</div>
+              <div class="pc-body gold-body"></div>
+              <div class="pc-legs gold-legs"><div class="pc-leg"></div><div class="pc-leg"></div></div>
             </div>
+            <div class="ps-name leader-name">{{ entries[0].user_name.split(' ')[0] }}</div>
+            <div class="ps-pts leader-pts">{{ entries[0].total_points }}<span class="pts-lbl">pts</span></div>
+            @if (entries[0].trend === 'up') { <span class="trend-chip up">▲</span> }
+            @else if (entries[0].trend === 'down') { <span class="trend-chip down">▼</span> }
+            <div class="ps-block block-gold">🥇</div>
           </div>
-          <div class="ps-name">{{ entries[1].user_name }}</div>
-          <div class="ps-pts">{{ entries[1].total_points }}<span class="pts-lbl">pts</span></div>
-          @if (entries[1].trend === 'up') { <span class="trend-chip up">▲</span> }
-          @else if (entries[1].trend === 'down') { <span class="trend-chip down">▼</span> }
-        }
-        <div class="ps-block block-silver">@if(entries.length >= 2){🥈}</div>
-      </div>
 
-      <!-- 1er lugar (centro, más alto) -->
-      <div class="podium-col gold-col">
-        <img class="podium-trophy" src="https://crests.football-data.org/wm26.png" alt="Copa" />
-        <div class="pc-wrap">
-          <div class="pc-head av-gold">{{ getPosEmoji(1) }}</div>
-          <div class="pc-body gold-body"></div>
-          <div class="pc-legs gold-legs">
-            <div class="pc-leg"></div>
-            <div class="pc-leg"></div>
+          <div class="podium-col">
+            @if (entries.length >= 3) {
+              <div class="pc-wrap">
+                <div class="pc-head av-bronze">{{ getPosEmoji(3) }}</div>
+                <div class="pc-body bronze-body"></div>
+                <div class="pc-legs bronze-legs"><div class="pc-leg"></div><div class="pc-leg"></div></div>
+              </div>
+              <div class="ps-name">{{ entries[2].user_name.split(' ')[0] }}</div>
+              <div class="ps-pts">{{ entries[2].total_points }}<span class="pts-lbl">pts</span></div>
+              @if (entries[2].trend === 'up') { <span class="trend-chip up">▲</span> }
+              @else if (entries[2].trend === 'down') { <span class="trend-chip down">▼</span> }
+            }
+            <div class="ps-block block-bronze">@if(entries.length >= 3){🥉}</div>
           </div>
+
         </div>
-        <div class="ps-name leader-name">{{ entries[0].user_name }}</div>
-        <div class="ps-pts leader-pts">{{ entries[0].total_points }}<span class="pts-lbl">pts</span></div>
-        @if (entries[0].trend === 'up') { <span class="trend-chip up">▲</span> }
-        @else if (entries[0].trend === 'down') { <span class="trend-chip down">▼</span> }
-        <div class="ps-block block-gold">🥇</div>
       </div>
+      }
 
-      <!-- 3er lugar (derecha) -->
-      <div class="podium-col">
-        @if (entries.length >= 3) {
-          <div class="pc-wrap">
-            <div class="pc-head av-bronze">{{ getPosEmoji(3) }}</div>
-            <div class="pc-body bronze-body"></div>
-            <div class="pc-legs bronze-legs">
-              <div class="pc-leg"></div>
-              <div class="pc-leg"></div>
+      <!-- ESTADIO EN CUENCO -->
+      @if (entries.length > 3) {
+      <div class="stadium-bowl">
+        <div class="fl fl-l"></div>
+        <div class="fl fl-r"></div>
+        @for (zone of stadiumZones; track zone.label) {
+          <div class="zone-row" [ngClass]="'zone-' + zone.zone">
+            <span class="zone-lbl">{{ zone.label }}</span>
+            <div class="zone-seats" [style.max-width.%]="zone.maxWidth">
+              @for (e of zone.entries; track e.user_id) {
+                <div class="zone-seat"
+                     [class.glow-up]="e.trend === 'up'"
+                     [class.glow-down]="e.trend === 'down'">
+                  <div class="zs-pos">{{ e.position }}</div>
+                  @if (e.trend === 'up')   { <div class="zs-trend up">↑</div> }
+                  @if (e.trend === 'down') { <div class="zs-trend dn">↓</div> }
+                  <div class="zs-emoji">{{ getPosEmoji(e.position ?? 99) }}</div>
+                  <div class="zs-name">{{ e.user_name.split(' ')[0] }}</div>
+                  <div class="zs-pts">{{ e.total_points }}<span>pts</span></div>
+                </div>
+              }
             </div>
           </div>
-          <div class="ps-name">{{ entries[2].user_name }}</div>
-          <div class="ps-pts">{{ entries[2].total_points }}<span class="pts-lbl">pts</span></div>
-          @if (entries[2].trend === 'up') { <span class="trend-chip up">▲</span> }
-          @else if (entries[2].trend === 'down') { <span class="trend-chip down">▼</span> }
         }
-        <div class="ps-block block-bronze">@if(entries.length >= 3){🥉}</div>
       </div>
+      }
 
     </div>
-    }
 
-    <!-- LISTA 4+ -->
-    @if (entries.length > 3) {
-    <div class="rest-list">
-      @for (entry of entries.slice(3); track trackById($index, entry)) {
-        <div class="rest-row">
-          <div class="rest-pos-block">
-            <span class="rest-pos">{{ entry.position }}</span>
-            @if (entry.trend === 'up') {
-              <span class="trend-arrow up">↑</span>
-            } @else if (entry.trend === 'down') {
-              <span class="trend-arrow down">↓</span>
+    <!-- ══ SIDEBAR DERECHA ══ -->
+    <div class="lb-sidebar">
+
+      <!-- MATCH CARD -->
+      @if (currentMatch) {
+      <div class="sb-match" [class.is-live]="isLive(currentMatch)" (click)="openPredModal(currentMatch)">
+        @if (isLive(currentMatch)) {
+          <div class="sb-match-header">
+            <span class="pulsing-badge">EN VIVO</span>
+          </div>
+        } @else {
+          <div class="sb-match-header pending">PRÓXIMO</div>
+        }
+        <div class="sb-match-score">
+          <div class="sb-team">
+            @if (getFlagUrl(currentMatch.home_team)) {
+              <img [src]="getFlagUrl(currentMatch.home_team)" [alt]="currentMatch.home_team" />
+            }
+            <span>{{ currentMatch.home_team }}</span>
+          </div>
+          <div class="sb-score-center">
+            @if (currentMatch.home_score !== null && currentMatch.away_score !== null) {
+              <div class="sb-score-nums">{{ currentMatch.home_score }} - {{ currentMatch.away_score }}</div>
             } @else {
-              <span class="trend-arrow same">=</span>
+              <div class="sb-score-nums">VS</div>
+            }
+            @if (isLive(currentMatch)) {
+              @if (currentMatch.period === 'HT') {
+                <div class="sb-minute">⏸ MT</div>
+              } @else if (getESPNClock(currentMatch)) {
+                <div class="sb-minute">⏱ {{ getESPNClock(currentMatch) }}</div>
+              } @else {
+                <div class="sb-minute">● EN VIVO</div>
+              }
+            } @else {
+              <div class="sb-minute muted">{{ formatMatchTime(currentMatch) }}</div>
             }
           </div>
-          <div class="rest-avatar">{{ getPosEmoji(entry.position ?? 99) }}</div>
-          <span class="rest-name">{{ entry.user_name }}</span>
-          <span class="rest-pts">{{ entry.total_points }} pts</span>
+          <div class="sb-team right">
+            @if (getFlagUrl(currentMatch.away_team)) {
+              <img [src]="getFlagUrl(currentMatch.away_team)" [alt]="currentMatch.away_team" />
+            }
+            <span>{{ currentMatch.away_team }}</span>
+          </div>
         </div>
+        @if (recentChanges.length > 0) {
+        <div class="sb-changes">
+          <div class="sb-changes-title">ÚLTIMOS CAMBIOS</div>
+          @for (ch of recentChanges; track ch.user_id) {
+            <div class="sb-change-row">
+              <span class="sb-ch-emoji">{{ getPosEmoji(ch.position) }}</span>
+              <span class="sb-ch-name">{{ ch.user_name.split(' ')[0] }}</span>
+              <span class="sb-ch-delta" [class.pos]="ch.delta > 0" [class.neg]="ch.delta < 0">
+                {{ ch.delta > 0 ? '+' : '' }}{{ ch.delta }} pts
+              </span>
+            </div>
+          }
+        </div>
+        }
+      </div>
       }
+
+      <!-- RIVALIDAD -->
+      @if (topRivalry) {
+      <div class="rivalry-card">
+        <div class="rivalry-title">⚡ RIVALIDAD DE LA JORNADA</div>
+        <div class="rivalry-body">
+          <div class="rivalry-player">
+            <div class="rivalry-emoji">{{ getPosEmoji(topRivalry.a.position ?? 99) }}</div>
+            <div class="rivalry-name">{{ topRivalry.a.user_name.split(' ')[0] }}</div>
+            <div class="rivalry-pts">{{ topRivalry.a.total_points }} <span>pts</span></div>
+          </div>
+          <div class="rivalry-vs">
+            <span>VS</span>
+            @if (topRivalry.a.trend === 'up')   { <div class="rv-trend up">↑</div> }
+            @if (topRivalry.a.trend === 'down') { <div class="rv-trend dn">↓</div> }
+          </div>
+          <div class="rivalry-player right">
+            <div class="rivalry-emoji">{{ getPosEmoji(topRivalry.b.position ?? 99) }}</div>
+            <div class="rivalry-name">{{ topRivalry.b.user_name.split(' ')[0] }}</div>
+            <div class="rivalry-pts">{{ topRivalry.b.total_points }} <span>pts</span></div>
+          </div>
+        </div>
+        <div class="rivalry-bar-wrap">
+          <div class="rivalry-bar">
+            <div class="rivalry-bar-fill" [style.width.%]="topRivalry.a.total_points / (topRivalry.a.total_points + topRivalry.b.total_points) * 100"></div>
+          </div>
+          <div class="rivalry-diff">Diferencia: {{ topRivalry.diff }} pts</div>
+        </div>
+      </div>
+      }
+
+      <!-- CHISMES -->
+      @if (gossipMessages.length > 0) {
+      <div class="gossip-panel">
+        <div class="gossip-title">💬 Chismes del Mundial</div>
+        <div class="gossip-list">
+          @for (g of gossipMessages; track g.text) {
+            <div class="gossip-card">
+              <span class="gossip-emoji">{{ g.emoji }}</span>
+              <span class="gossip-text">{{ g.text }}</span>
+            </div>
+          }
+        </div>
+      </div>
+      }
+
+      <!-- LOGROS RECIENTES -->
+      @if (achievements.length > 0) {
+      <div class="achievements-card">
+        <div class="ach-title">🏅 LOGROS RECIENTES</div>
+        <div class="ach-list">
+          @for (a of achievements; track a.label) {
+            <div class="ach-badge">
+              <div class="ach-hex">{{ a.emoji }}</div>
+              <div class="ach-label">{{ a.label }}</div>
+              <div class="ach-name">{{ a.name }}</div>
+            </div>
+          }
+        </div>
+      </div>
+      }
+
     </div>
-    }
 
   </div>
   } <!-- end leaderboard view -->

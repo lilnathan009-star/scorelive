@@ -86,13 +86,24 @@ export class Leaderboard implements OnInit, OnDestroy {
   ngOnInit() {
     this.cargarLeaderboard();
     this.pollInterval = setInterval(() => this.cargarLeaderboard(), 5000);
+    this.loadStats();
 
     // Leaderboard via socket
     this.subs.push(
       this.socketService.onLeaderboardUpdate().subscribe(data => {
         if (data.length > 0) {
-          this.previousEntries = [...this.entries];
+          const prev = [...this.entries];
+          this.previousEntries = prev;
           this.entries = this.addPositions(data);
+          this.recentChanges = this.entries
+            .map(e => {
+              const p = prev.find(x => x.user_id === e.user_id);
+              return { user_id: e.user_id, user_name: e.user_name, position: e.position ?? 99, delta: p ? e.total_points - p.total_points : 0, trend: e.trend ?? 'same' };
+            })
+            .filter(e => e.delta !== 0)
+            .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))
+            .slice(0, 5);
+          this.loadGossip();
           this.cdr.detectChanges();
         }
       })
@@ -213,8 +224,8 @@ export class Leaderboard implements OnInit, OnDestroy {
   cargarLeaderboard() {
     this.http.get<any[]>('/api/leaderboard').subscribe({
       next: data => {
-        this.previousEntries = [...this.entries];
         this.entries = this.addPositions(data);
+        if (this.gossipPool.length === 0) this.loadGossip();
         this.cdr.detectChanges();
       },
       error: () => {}
@@ -432,6 +443,359 @@ export class Leaderboard implements OnInit, OnDestroy {
   }
 
   trackById(_: number, e: LeaderboardEntry) { return e.user_id; }
+
+  gossipMessages: { emoji: string; text: string }[] = [];
+  private gossipPool: { emoji: string; text: string }[] = [];
+
+  statsData = { predictions: 0, accuracy: 0 };
+  recentChanges: { user_id: number; user_name: string; position: number; delta: number; trend: string }[] = [];
+  starPredictor = '';
+
+  loadStats() {
+    this.http.get<any>('/api/stats').subscribe({
+      next: d => { this.statsData = d; this.cdr.detectChanges(); },
+      error: () => {}
+    });
+  }
+
+  get trendStats() {
+    return {
+      up: this.entries.filter(e => e.trend === 'up').length,
+      down: this.entries.filter(e => e.trend === 'down').length,
+    };
+  }
+
+  get achievements() {
+    const e = this.entries;
+    if (!e.length) return [];
+
+    const used = new Set<string>();
+    const list: { emoji: string; label: string; name: string }[] = [];
+
+    const add = (emoji: string, label: string, raw: string) => {
+      const name = raw.split(' ')[0];
+      if (used.has(name)) return;
+      used.add(name);
+      list.push({ emoji, label, name });
+    };
+
+    // Líder
+    add('👑', 'Líder', e[0].user_name);
+
+    // Remontada: el que más subió y está más abajo en la tabla
+    const climbers = e.filter(x => x.trend === 'up')
+      .sort((a, b) => (b.position ?? 0) - (a.position ?? 0));
+    if (climbers.length > 0) add('🚀', 'Remontada', climbers[0].user_name);
+
+    // Pulpo Paul: mejor predictor — solo cuando ya cargó y no es el mismo jugador
+    if (this.starPredictor) add('🐙', 'Pulpo Paul', this.starPredictor);
+
+    // Cazador: 2do lugar subiendo, solo si hay espacio y es diferente
+    if (list.length < 3 && e.length > 1 && e[1].trend === 'up') {
+      add('🎯', 'Cazador', e[1].user_name);
+    }
+
+    return list;
+  }
+
+  loadGossip() {
+    const leaderPool = this.buildLeaderboardPool();
+    this.gossipPool = leaderPool;
+    this.rotateGossip();
+
+    this.http.get<any[]>('/api/gossip-data').subscribe({
+      next: matches => {
+        const matchPool = this.buildMatchPool(matches);
+        // Chismes de partidos al frente para que salgan más seguido
+        this.gossipPool = [...matchPool, ...leaderPool];
+        this.rotateGossip();
+        this.cdr.detectChanges();
+      },
+      error: () => {}
+    });
+  }
+
+  private buildMatchPool(matches: any[]): { emoji: string; text: string }[] {
+    const pool: { emoji: string; text: string }[] = [];
+    const fn = (name: string) => name.split(' ')[0];
+    const tn = (t: string) => t.split(' ').slice(0, 2).join(' ');
+
+    for (const m of matches) {
+      if (!m.predictions?.length) continue;
+      const rH = m.home_score, rA = m.away_score;
+      const hN = tn(m.home_team), aN = tn(m.away_team);
+      const result = rH > rA ? 'home' : rA > rH ? 'away' : 'draw';
+      const winner = result === 'home' ? hN : result === 'away' ? aN : null;
+      const loser  = result === 'home' ? aN : result === 'away' ? hN : null;
+
+      const preds      = m.predictions;
+      const total      = preds.length;
+      const exactHits  = preds.filter((p: any) => p.pred_home === rH && p.pred_away === rA);
+      const zeroPoints = preds.filter((p: any) => p.points === 0);
+      const betHome    = preds.filter((p: any) => p.pred_home > p.pred_away);
+      const betAway    = preds.filter((p: any) => p.pred_away > p.pred_home);
+      const betDraw    = preds.filter((p: any) => p.pred_home === p.pred_away);
+      const betWinner  = result === 'home' ? betHome : result === 'away' ? betAway : betDraw;
+      const betLoser   = result === 'home' ? betAway : result === 'away' ? betHome : [];
+
+      // ── Marcador exacto ──
+      if (exactHits.length === 1) {
+        pool.push({ emoji: '🎯', text: `${fn(exactHits[0].user_name)} fue el único que clavó el ${rH}-${rA} de ${hN} vs ${aN}.` });
+      } else if (exactHits.length >= 2) {
+        const ns = exactHits.slice(0, 2).map((p: any) => fn(p.user_name)).join(' y ');
+        pool.push({ emoji: '🎯', text: `${ns} acertaron el ${rH}-${rA} exacto en ${hN} vs ${aN}. Cracks.` });
+      } else if (exactHits.length === 0 && m.status === 'finished') {
+        pool.push({ emoji: '🙈', text: `Nadie clavó el marcador exacto de ${hN} vs ${aN}. El fútbol es impredecible.` });
+      }
+
+      // ── Apostaron por el perdedor ──
+      if (loser && betLoser.length === 1) {
+        const p = betLoser[0];
+        pool.push({ emoji: '😭', text: `${fn(p.user_name)} apostó ${p.pred_home}-${p.pred_away} por ${p.pred_home > p.pred_away ? hN : aN}. Ganó ${winner}.` });
+      } else if (loser && betLoser.length >= 2 && betLoser.length <= 4) {
+        const ns = betLoser.slice(0, 2).map((p: any) => fn(p.user_name)).join(', ');
+        pool.push({ emoji: '😬', text: `${ns} y otros apostaron por ${loser}. ${winner} los dejó fríos.` });
+      } else if (loser && betLoser.length > total * 0.55) {
+        pool.push({ emoji: '💀', text: `${betLoser.length} de ${total} apostaron por ${loser}. ${winner} ganó. Masacre colectiva.` });
+      }
+
+      // ── Pocos apostaron por el ganador ──
+      if (winner && betWinner.length > 0 && betWinner.length <= 3 && total > 5) {
+        const ns = betWinner.slice(0, 2).map((p: any) => fn(p.user_name)).join(' y ');
+        pool.push({ emoji: '🦅', text: `Solo ${betWinner.length} creyeron en ${winner}. ${ns} entre ellos. Cobraron bien.` });
+      }
+
+      // ── Todos apostaron por el ganador ──
+      if (winner && betWinner.length > total * 0.8) {
+        pool.push({ emoji: '📖', text: `${betWinner.length} de ${total} apostaron por ${winner} y acertaron. Raro verlos a todos felices.` });
+      }
+
+      // ── Cero puntos ──
+      if (zeroPoints.length > 0 && zeroPoints.length <= 3) {
+        const ns = zeroPoints.map((p: any) => fn(p.user_name)).join(', ');
+        pool.push({ emoji: '🥲', text: `${ns} sacó 0 puntos en ${hN} vs ${aN}. Día para olvidar.` });
+      } else if (zeroPoints.length > 4) {
+        pool.push({ emoji: '💥', text: `${zeroPoints.length} jugadores se fueron con cero en ${hN} vs ${aN}. Nadie lo vio venir.` });
+      }
+
+      // ── Empate ──
+      if (result === 'draw') {
+        pool.push({ emoji: '😐', text: `Empate ${rH}-${rA} en ${hN} vs ${aN}. El resultado más difícil de adivinar.` });
+        if (betDraw.length === 0) {
+          pool.push({ emoji: '😂', text: `Nadie apostó por el empate de ${hN} vs ${aN}. Ni uno solo.` });
+        } else if (betDraw.length === 1) {
+          pool.push({ emoji: '🔮', text: `${fn(betDraw[0].user_name)} fue el único que apostó empate en ${hN} vs ${aN}. Adivino.` });
+        }
+      }
+    }
+
+    // Compute star predictor (player with most points across recent matches)
+    const totals: Record<string, number> = {};
+    for (const m of matches) {
+      for (const p of (m.predictions || [])) {
+        totals[p.user_name] = (totals[p.user_name] || 0) + (p.points || 0);
+      }
+    }
+    const top = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
+    if (top) this.starPredictor = top[0].split(' ')[0];
+
+    return pool;
+  }
+
+  private buildLeaderboardPool(): { emoji: string; text: string }[] {
+    const e = this.entries;
+    if (e.length < 2) return [];
+    const n = (u: any) => u.user_name.split(' ')[0];
+    const pool: { emoji: string; text: string }[] = [];
+
+    const L  = n(e[0]);
+    const UL = n(e[e.length - 1]);
+    const d01 = e[0].total_points - e[1].total_points;
+
+    // ── Líder ──
+    pool.push(
+      { emoji: '👑', text: `${L} con ${d01} pts de ventaja. ¿Alguien lo para?` },
+      { emoji: '😴', text: `${L} durmiendo y sigue primero. Los demás sufriendo.` },
+      { emoji: '🤷', text: `${L} viendo Netflix mientras los demás rezan.` },
+      { emoji: '💪', text: `${L} aguanta el liderato. Por ahora.` },
+      { emoji: '🎩', text: `${L} recibe coronas y ni se inmuta.` },
+      { emoji: '🥱', text: `${L} bostezando en primer lugar. ¿Qué le hace?` },
+      { emoji: '😎', text: `${L} en modo vacaciones mentales. Sigue primero igual.` },
+      { emoji: '🏆', text: `${L} ya eligió dónde pone el trofeo. Que no se confíe.` },
+      { emoji: '🤩', text: `${L} brilla desde el #1. Pero el torneo no terminó.` },
+    );
+
+    // ── Segundo ──
+    if (e.length >= 2) {
+      const S = n(e[1]);
+      pool.push(
+        { emoji: '😤', text: `${S} en segundo otra vez. Duele más que el último.` },
+        { emoji: '🔪', text: `${S} tan cerca y tan lejos. La eterna historia del eterno segundo.` },
+        { emoji: '😏', text: `${S} dice que va tranquilo. Nadie le cree.` },
+        { emoji: '🥈', text: `${S} coleccionando platas. Alguien tiene que hacerlo.` },
+        { emoji: '😒', text: `${S} harto del segundo lugar. Pero ahí sigue.` },
+        { emoji: '🫠', text: `${S} a ${d01} pts del primero. ${d01 <= 5 ? 'Alcanzable.' : 'Lejos.'}` },
+        { emoji: '🤬', text: `${S} internamente destruido. Externamente sonríe.` },
+      );
+    }
+
+    // ── Tercero ──
+    if (e.length >= 3) {
+      const T = n(e[2]);
+      const d12 = e[1].total_points - e[2].total_points;
+      pool.push(
+        { emoji: '🎯', text: `${T} en tercero. El bronce también brilla, dicen.` },
+        { emoji: '🤫', text: `${T} callado en el podio. Los silenciosos son peligrosos.` },
+        { emoji: '😬', text: `${T} mirando arriba y abajo al mismo tiempo.` },
+        { emoji: '🥉', text: `${T} tiene medalla pero quiere más. Normal.` },
+        { emoji: '👁️', text: `${T} a ${d12} pts del segundo. La matemática existe.` },
+      );
+    }
+
+    // ── Cuarto ──
+    if (e.length >= 4) {
+      const C = n(e[3]);
+      pool.push(
+        { emoji: '😭', text: `${C} a un paso del podio. Un paso que parece kilómetros.` },
+        { emoji: '💔', text: `${C} el mejor de los que no están en top 3. Pobre consuelo.` },
+        { emoji: '😡', text: `${C} fuera del podio otra vez. La rabia se acumula.` },
+        { emoji: '🫤', text: `${C} en cuarto. Ni chicha ni limonada.` },
+        { emoji: '🔥', text: `${C} a punto de entrar al podio. O no. Quién sabe.` },
+      );
+    }
+
+    // ── Quinto ──
+    if (e.length >= 5) {
+      const Q = n(e[4]);
+      pool.push(
+        { emoji: '👀', text: `${Q} en quinto. Acechando. Siempre acechando.` },
+        { emoji: '🤙', text: `${Q} a un partido de cambiar todo. Eso dicen todos.` },
+        { emoji: '🎲', text: `${Q} necesita que los de arriba fallen. El fútbol es así.` },
+      );
+    }
+
+    // ── Rivalidades entre pares consecutivos ──
+    for (let i = 0; i < Math.min(e.length - 1, 12); i++) {
+      const A = n(e[i]), B = n(e[i + 1]);
+      const d = e[i].total_points - e[i + 1].total_points;
+      if (d === 0) {
+        pool.push(
+          { emoji: '🤝', text: `${A} y ${B} igualados en puntos. Solo el desempate los separa.` },
+          { emoji: '⚖️', text: `${A} y ${B} empatados. El próximo partido decide.` },
+          { emoji: '😳', text: `${A} y ${B} con los mismos puntos. Tensión máxima.` },
+        );
+      } else if (d <= 2) {
+        pool.push(
+          { emoji: '⚡', text: `${A} y ${B} a ${d} pt${d > 1 ? 's' : ''}. Un gol de diferencia.` },
+          { emoji: '🔥', text: `${B} persigue a ${A} con ${d} pt${d > 1 ? 's' : ''}. Modo cazador.` },
+          { emoji: '😰', text: `${A} con ${d} pt${d > 1 ? 's' : ''} sobre ${B}. Duerme mal.` },
+          { emoji: '💣', text: `${A} vs ${B}: ${d} pt${d > 1 ? 's' : ''} de diferencia. Esto explota.` },
+        );
+      } else if (d <= 5) {
+        pool.push(
+          { emoji: '👀', text: `${B} a ${d} pts de ${A}. Se viene.` },
+          { emoji: '🏃', text: `${B} corriendo detrás de ${A}. La distancia se cierra.` },
+          { emoji: '😤', text: `${A} siente el aliento de ${B}. Son ${d} pts.` },
+        );
+      } else if (d <= 10) {
+        pool.push(
+          { emoji: '🎯', text: `${B} a ${d} pts de ${A}. Lejos pero no imposible.` },
+          { emoji: '🤔', text: `${A} cómodo ${d} pts sobre ${B}. Por ahora.` },
+        );
+      }
+    }
+
+    // ── Subiendo ──
+    for (const r of e.filter(x => x.trend === 'up')) {
+      const R = n(r);
+      pool.push(
+        { emoji: '🚀', text: `${R} de remontada. No lo den por muerto.` },
+        { emoji: '📈', text: `${R} subiendo esta jornada. Los de arriba que abran los ojos.` },
+        { emoji: '😤', text: `${R} activó el modo bestia. Cuidado con él.` },
+        { emoji: '🔝', text: `${R} en racha. Algo hizo bien esta vez.` },
+        { emoji: '💥', text: `${R} explotó esta jornada. No para.` },
+        { emoji: '🎯', text: `${R} acertando de a poco. Va escalando.` },
+      );
+    }
+
+    // ── Bajando ──
+    for (const f of e.filter(x => x.trend === 'down')) {
+      const F = n(f);
+      pool.push(
+        { emoji: '😭', text: `${F} apostó con el corazón. El corazón le falló.` },
+        { emoji: '🪦', text: `Los pronósticos de ${F} esta jornada, descansen en paz.` },
+        { emoji: '🤦', text: `${F} vio el partido y lloró. Los puntos también.` },
+        { emoji: '📉', text: `${F} bajando. Así es el fútbol, amigo.` },
+        { emoji: '😬', text: `${F} eligió mal. Todos elegimos mal a veces.` },
+        { emoji: '🥲', text: `${F} dice que tenía razón pero la tabla no opina lo mismo.` },
+      );
+    }
+
+    // ── Zona media (pos 6-14) ──
+    for (const m of e.filter(x => (x.position ?? 99) >= 6 && (x.position ?? 99) <= 14)) {
+      const M = n(m);
+      pool.push(
+        { emoji: '😐', text: `${M} en tierra de nadie. Ni arriba ni abajo.` },
+        { emoji: '👀', text: `${M} acechando desde el medio. Nadie lo nota todavía.` },
+        { emoji: '🤔', text: `${M} lleva jornadas sin moverse. El hombre del statu quo.` },
+        { emoji: '🎭', text: `${M} en el medio del drama sin ser parte del drama.` },
+        { emoji: '⏳', text: `${M} esperando su momento. Sigue esperando.` },
+      );
+    }
+
+    // ── Zona baja ──
+    for (const p of e.filter(x => (x.position ?? 99) >= 15 && (x.position ?? 99) < e.length)) {
+      const P = n(p);
+      pool.push(
+        { emoji: '😬', text: `${P} en zona de peligro. No es el lugar que quería.` },
+        { emoji: '🆘', text: `${P} necesita puntos urgente. Urgentísimo.` },
+        { emoji: '😓', text: `${P} mirando la tabla y preferiría no mirarla.` },
+        { emoji: '🙈', text: `${P} cerró los ojos y la tabla sigue igual.` },
+      );
+    }
+
+    // ── Último ──
+    pool.push(
+      { emoji: '💀', text: `${UL} en el sótano. Una remontada épica sería histórica.` },
+      { emoji: '🙏', text: `${UL} necesita un milagro. El fútbol tiene de eso.` },
+      { emoji: '🤡', text: `${UL} apostó con lógica. El fútbol no tiene lógica.` },
+      { emoji: '😤', text: `${UL} dice que el próximo partido lo cambia todo. Siempre.` },
+      { emoji: '🥲', text: `${UL} último pero con dignidad. Eso cuenta, ¿no?` },
+      { emoji: '🫡', text: `${UL} desde el fondo lucha. Respeto.` },
+      { emoji: '🎰', text: `${UL} arriesgó en todos los partidos. Así salió.` },
+      { emoji: '😵', text: `${UL} revisando qué salió mal. Spoiler: todo.` },
+      { emoji: '🌱', text: `${UL} en el último lugar pero el torneo no terminó.` },
+    );
+
+    return pool;
+  }
+
+  rotateGossip() {
+    this.gossipMessages = [...this.gossipPool]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 3);
+  }
+
+  get topRivalry() {
+    const e = this.entries;
+    if (e.length < 2) return null;
+    let best = { a: e[0], b: e[1], diff: e[0].total_points - e[1].total_points };
+    for (let i = 1; i < e.length - 1; i++) {
+      const diff = e[i].total_points - e[i + 1].total_points;
+      if (diff < best.diff) best = { a: e[i], b: e[i + 1], diff };
+    }
+    return best;
+  }
+
+  get stadiumZones() {
+    return [
+      { label: 'CANCHA',       zone: 'cancha',   entries: this.entries.slice(0, 3),   maxWidth: 54 },
+      { label: 'PALCO VIP',    zone: 'palco',    entries: this.entries.slice(3, 7),   maxWidth: 68 },
+      { label: 'TRIBUNA',      zone: 'tribuna',  entries: this.entries.slice(7, 12),  maxWidth: 82 },
+      { label: 'GRADERÍA',     zone: 'graderia', entries: this.entries.slice(12, 18), maxWidth: 93 },
+      { label: 'GALERÍA ALTA', zone: 'galeria',  entries: this.entries.slice(18),     maxWidth: 100 },
+    ].filter(z => z.entries.length > 0);
+  }
 
   // Modal pronósticos
   showPredModal = false;
