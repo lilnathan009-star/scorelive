@@ -1045,7 +1045,7 @@
   letter-spacing: 4px;
   color: rgba(255,255,255,0.42);
   text-shadow: 0 1px 3px rgba(0,0,0,0.9);
-  padding: 5px 0 1px;
+  padding: 10px 0 2px;
   position: relative;
   z-index: 1;
 }
@@ -1053,20 +1053,23 @@
 .form-row {
   display: flex;
   justify-content: center;
-  gap: 7px;
-  padding: 2px 8px 2px;
+  gap: 10px;
+  padding: 2px 8px 10px;
   position: relative;
   z-index: 1;
   --zc: #FFE500;
+
+  &.form-row-gk { padding-bottom: 14px; }
 }
 
+/* Suplentes — fuera de la cancha, debajo del stadium-bowl */
 .suplentes-section {
-  margin: 8px 0 0;
-  border-top: 2px dashed rgba(255,255,255,0.2);
-  padding: 6px 8px 8px;
-  position: relative;
-  z-index: 1;
-  --zc: rgba(255,255,255,0.7);
+  margin-top: 10px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 8px 8px 10px;
+  --zc: rgba(255,255,255,0.75);
 }
 
 .suplentes-title {
@@ -1076,18 +1079,19 @@
   letter-spacing: 5px;
   color: rgba(255,255,255,0.55);
   text-shadow: 0 1px 4px rgba(0,0,0,0.9);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .suplentes-bench {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 5px;
+  gap: 6px;
 
   .zone-seat {
-    min-width: 60px;
-    padding: 5px 5px;
+    min-width: 62px;
+    padding: 5px 6px;
+    background: rgba(0,0,0,0.3);
     .zs-emoji { font-size: 1.3rem; }
     .zs-name  { font-size: 0.64rem; }
     .zs-pts   { font-size: 0.68rem; }
