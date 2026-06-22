@@ -500,18 +500,19 @@ export class Leaderboard implements OnInit, OnDestroy {
 
   loadGossip() {
     const leaderPool = this.buildLeaderboardPool();
-    this.gossipPool = leaderPool;
-    this.rotateGossip();
 
     this.http.get<any[]>('/api/gossip-data').subscribe({
       next: matches => {
         const matchPool = this.buildMatchPool(matches);
-        // Chismes de partidos al frente para que salgan más seguido
         this.gossipPool = [...matchPool, ...leaderPool];
         this.rotateGossip();
         this.cdr.detectChanges();
       },
-      error: () => {}
+      error: () => {
+        this.gossipPool = leaderPool;
+        this.rotateGossip();
+        this.cdr.detectChanges();
+      }
     });
   }
 
