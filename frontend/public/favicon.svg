@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Fondo circular verde -->
+  <circle cx="32" cy="32" r="30" fill="#1d7a26"/>
+  <!-- Balón blanco -->
+  <circle cx="32" cy="32" r="20" fill="white" stroke="#111" stroke-width="1.5"/>
+  <!-- Pentágono central negro -->
+  <polygon points="32,16 39,22 36,30 28,30 25,22" fill="#111"/>
+  <!-- Pentágonos laterales -->
+  <polygon points="16,26 23,22 25,30 20,36 13,33" fill="#111"/>
+  <polygon points="48,26 41,22 39,30 44,36 51,33" fill="#111"/>
+  <polygon points="20,44 20,36 28,30 32,36 28,44" fill="#111"/>
+  <polygon points="44,44 44,36 36,30 32,36 36,44" fill="#111"/>
+</svg>
