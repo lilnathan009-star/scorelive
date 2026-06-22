@@ -1151,7 +1151,10 @@
 
 .cm-drop { margin-top: 28px; }
 
-.form-row-mid { padding: 0 80px; }
+.form-row-mid {
+  padding: 0 80px;
+  @media (max-width: 600px) { padding: 0 20px; }
+}
 
 /* ── Suplentes — card separada con acento de color ── */
 .suplentes-section {
