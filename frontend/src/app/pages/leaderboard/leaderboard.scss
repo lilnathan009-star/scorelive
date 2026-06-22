@@ -1039,13 +1039,51 @@
 
 .cf-advance { margin-top: -22px; }
 
+/* Portería del GK */
+.form-section-gk {
+  position: relative;
+
+  // Área grande (penalty box)
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: calc(100% + 20px);
+    border: 2px solid rgba(255,255,255,0.2);
+    border-bottom: none;
+    border-radius: 2px 2px 0 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  // Portería (arco)
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 108px;
+    height: calc(100% - 8px);
+    border: 3px solid rgba(255,255,255,0.55);
+    border-bottom: none;
+    border-radius: 2px 2px 0 0;
+    box-shadow: 0 0 10px rgba(255,255,255,0.15);
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
 // Wrapper que ocupa todo el alto del pitch y distribuye las secciones
 .form-pitch {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 580px;
-  padding: 6px 0 16px;
+  min-height: 680px;
+  padding: 28px 0 20px;
   position: relative;
   z-index: 1;
 }
