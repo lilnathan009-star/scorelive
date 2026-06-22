@@ -1077,6 +1077,7 @@
 .form-row {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   width: 100%;
   padding: 0 24px;
   box-sizing: border-box;
@@ -1087,6 +1088,8 @@
     justify-content: center;
   }
 }
+
+.cm-drop { margin-top: 28px; }
 
 /* ── Suplentes — card separada con acento de color ── */
 .suplentes-section {
