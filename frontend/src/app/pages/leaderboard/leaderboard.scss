@@ -1027,6 +1027,18 @@
 
 /* ── Formación 4-3-3 ── */
 
+.formation-title {
+  text-align: center;
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 7px;
+  color: rgba(255,255,255,0.88);
+  text-shadow: 0 1px 6px rgba(0,0,0,0.7);
+  padding: 10px 0 6px;
+}
+
+.cf-advance { margin-top: -22px; }
+
 // Wrapper que ocupa todo el alto del pitch y distribuye las secciones
 .form-pitch {
   display: flex;
@@ -1036,16 +1048,6 @@
   padding: 6px 0 16px;
   position: relative;
   z-index: 1;
-}
-
-.form-header {
-  text-align: center;
-  font-size: 0.62rem;
-  font-weight: 900;
-  letter-spacing: 7px;
-  color: rgba(255,255,255,0.92);
-  text-shadow: 0 1px 6px rgba(0,0,0,0.8);
-  padding: 4px 0 0;
 }
 
 .form-section {

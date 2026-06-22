@@ -798,6 +798,16 @@ export class Leaderboard implements OnInit, OnDestroy {
     return this.FORMATION_ROLES[row]?.[index] ?? '';
   }
 
+  // Fila de delanteros: CF (#1) al centro, LW (#2) izq, RW (#3) der
+  get forwardRow() {
+    const e = this.entries;
+    return [
+      { entry: e[1], role: 'LW', cf: false },
+      { entry: e[0], role: 'CF', cf: true  },
+      { entry: e[2], role: 'RW', cf: false },
+    ].filter(x => x.entry);
+  }
+
   // Modal pronósticos
   showPredModal = false;
   predModalTitle = '';

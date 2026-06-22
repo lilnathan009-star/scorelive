@@ -300,25 +300,28 @@
 
       <!-- FORMACIÓN 4-3-3 — solo cancha, 11 jugadores -->
       @if (entries.length > 0) {
+      <div class="formation-title">⚽ 11 INICIAL</div>
       <div class="stadium-bowl">
         <div class="fl fl-l"></div>
         <div class="fl fl-r"></div>
 
         <div class="form-pitch">
-          <div class="form-header">⚽ 11 INICIAL</div>
 
           <div class="form-section">
             <div class="form-role-lbl">DELANTEROS</div>
             <div class="form-row">
-              @for (e of entries.slice(0, 3); track e.user_id; let i = $index) {
-                <div class="zone-seat" [class.glow-up]="e.trend === 'up'" [class.glow-down]="e.trend === 'down'">
-                  <div class="zs-role">{{ getRole('fwd', i) }}</div>
-                  <div class="zs-pos">{{ e.position }}</div>
-                  @if (e.trend === 'up')   { <div class="zs-trend up">↑</div> }
-                  @if (e.trend === 'down') { <div class="zs-trend dn">↓</div> }
-                  <div class="zs-emoji">{{ getPosEmoji(e.position ?? 99) }}</div>
-                  <div class="zs-name">{{ e.user_name.split(' ')[0] }}</div>
-                  <div class="zs-pts">{{ e.total_points }}<span>pts</span></div>
+              @for (fw of forwardRow; track fw.entry.user_id) {
+                <div class="zone-seat"
+                     [class.glow-up]="fw.entry.trend === 'up'"
+                     [class.glow-down]="fw.entry.trend === 'down'"
+                     [class.cf-advance]="fw.cf">
+                  <div class="zs-role">{{ fw.role }}</div>
+                  <div class="zs-pos">{{ fw.entry.position }}</div>
+                  @if (fw.entry.trend === 'up')   { <div class="zs-trend up">↑</div> }
+                  @if (fw.entry.trend === 'down') { <div class="zs-trend dn">↓</div> }
+                  <div class="zs-emoji">{{ getPosEmoji(fw.entry.position ?? 99) }}</div>
+                  <div class="zs-name">{{ fw.entry.user_name.split(' ')[0] }}</div>
+                  <div class="zs-pts">{{ fw.entry.total_points }}<span>pts</span></div>
                 </div>
               }
             </div>
