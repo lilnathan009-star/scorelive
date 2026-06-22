@@ -8,6 +8,7 @@ const path = require('path');
 const routes = require('./routes/index');
 const { initSocket } = require('./socket/socketHandler');
 const { startLivePolling } = require('./services/liveScoreService');
+const { startAutoMatchImport } = require('./services/autoMatchService');
 
 const app = express();
 const server = http.createServer(app);
@@ -36,4 +37,5 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Scorelive backend corriendo en puerto ${PORT}`);
   startLivePolling(io);
+  startAutoMatchImport();
 });
