@@ -1032,8 +1032,8 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 480px;
-  padding: 6px 0 10px;
+  min-height: 580px;
+  padding: 6px 0 16px;
   position: relative;
   z-index: 1;
 }
@@ -1062,6 +1062,16 @@
   color: rgba(255,255,255,0.4);
   text-shadow: 0 1px 3px rgba(0,0,0,0.9);
   margin-bottom: 4px;
+}
+
+.zs-role {
+  font-size: 0.5rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+  margin-bottom: 1px;
+  line-height: 1;
 }
 
 .form-row {

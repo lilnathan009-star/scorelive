@@ -787,14 +787,15 @@ export class Leaderboard implements OnInit, OnDestroy {
     return best;
   }
 
-  get stadiumZones() {
-    return [
-      { label: 'CANCHA',       zone: 'cancha',   entries: this.entries.slice(0, 3),   maxWidth: 54 },
-      { label: 'PALCO VIP',    zone: 'palco',    entries: this.entries.slice(3, 7),   maxWidth: 68 },
-      { label: 'TRIBUNA',      zone: 'tribuna',  entries: this.entries.slice(7, 12),  maxWidth: 82 },
-      { label: 'GRADERÍA',     zone: 'graderia', entries: this.entries.slice(12, 18), maxWidth: 93 },
-      { label: 'GALERÍA ALTA', zone: 'galeria',  entries: this.entries.slice(18),     maxWidth: 100 },
-    ].filter(z => z.entries.length > 0);
+  private readonly FORMATION_ROLES: Record<string, string[]> = {
+    fwd: ['LW', 'CF', 'RW'],
+    mid: ['LCM', 'CM', 'RCM'],
+    def: ['LB',  'LCB', 'RCB', 'RB'],
+    gk:  ['GK'],
+  };
+
+  getRole(row: string, index: number): string {
+    return this.FORMATION_ROLES[row]?.[index] ?? '';
   }
 
   // Modal pronósticos
