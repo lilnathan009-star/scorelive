@@ -103,7 +103,7 @@ export class Leaderboard implements OnInit, OnDestroy {
             .filter(e => e.delta !== 0)
             .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))
             .slice(0, 5);
-          this.loadGossip();
+          if (this.recentChanges.length > 0) this.loadGossip();
           this.cdr.detectChanges();
         }
       })
@@ -446,6 +446,8 @@ export class Leaderboard implements OnInit, OnDestroy {
 
   gossipMessages: { emoji: string; text: string }[] = [];
   private gossipPool: { emoji: string; text: string }[] = [];
+  private gossipLoading = false;
+  private gossipRotateInterval: any;
 
   statsData = { predictions: 0, accuracy: 0 };
   recentChanges: { user_id: number; user_name: string; position: number; delta: number; trend: string }[] = [];
@@ -499,18 +501,24 @@ export class Leaderboard implements OnInit, OnDestroy {
   }
 
   loadGossip() {
+    if (this.gossipLoading) return;
+    this.gossipLoading = true;
     const leaderPool = this.buildLeaderboardPool();
 
     this.http.get<any[]>('/api/gossip-data').subscribe({
       next: matches => {
         const matchPool = this.buildMatchPool(matches);
         this.gossipPool = [...matchPool, ...leaderPool];
+        this.gossipLoading = false;
         this.rotateGossip();
+        this.startGossipRotation();
         this.cdr.detectChanges();
       },
       error: () => {
         this.gossipPool = leaderPool;
+        this.gossipLoading = false;
         this.rotateGossip();
+        this.startGossipRotation();
         this.cdr.detectChanges();
       }
     });
@@ -771,6 +779,14 @@ export class Leaderboard implements OnInit, OnDestroy {
     return pool;
   }
 
+  startGossipRotation() {
+    if (this.gossipRotateInterval) return;
+    this.gossipRotateInterval = setInterval(() => {
+      this.rotateGossip();
+      this.cdr.detectChanges();
+    }, 20000);
+  }
+
   rotateGossip() {
     this.gossipMessages = [...this.gossipPool]
       .sort(() => Math.random() - 0.5)
@@ -840,5 +856,6 @@ export class Leaderboard implements OnInit, OnDestroy {
     clearInterval(this.matchPollInterval);
     clearInterval(this.rotateInterval);
     clearInterval(this.espnInterval);
+    clearInterval(this.gossipRotateInterval);
   }
 }
