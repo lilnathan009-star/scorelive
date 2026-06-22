@@ -1025,77 +1025,76 @@
   &.fl-r { right: 8%; }
 }
 
-/* Zone rows — todas transparentes sobre el pasto */
-.zone-row {
-  position: relative;
-
-  // Área de portería superior
-  &.zone-cancha {
-    background: rgba(0,0,0,0.06);
-    border-bottom: 2px solid rgba(255,255,255,0.18);
-
-    .zone-lbl { color: rgba(255,255,255,0.7); letter-spacing: 8px; }
-
-    .zone-seat {
-      background: rgba(0,0,0,0.42);
-      border-color: rgba(255,255,255,0.3);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-    }
-
-    // Área chica (penalty box outline)
-    &::before {
-      content: '';
-      position: absolute;
-      left: 50%; top: 0;
-      transform: translateX(-50%);
-      width: 50%; height: 100%;
-      border: 2px solid rgba(255,255,255,0.18);
-      border-top: none;
-      pointer-events: none;
-      z-index: 0;
-    }
-  }
-
-  &.zone-palco   { background: rgba(0,0,0,0.05); --zc: #FFE500; border-bottom: 1px solid rgba(255,255,255,0.1); }
-  &.zone-tribuna { background: rgba(0,0,0,0.04); --zc: #FFE500; }
-  &.zone-graderia{ background: rgba(0,0,0,0.05); --zc: #FFE500; border-top: 1px solid rgba(255,255,255,0.1); }
-
-  // Área de portería inferior
-  &.zone-galeria {
-    background: rgba(0,0,0,0.06);
-    --zc: rgba(255,255,255,0.8);
-    border-top: 2px solid rgba(255,255,255,0.18);
-    border-radius: 0 0 10px 10px;
-
-    // Área chica inferior
-    &::before {
-      content: '';
-      position: absolute;
-      left: 50%; bottom: 0;
-      transform: translateX(-50%);
-      width: 50%; height: 65%;
-      border: 2px solid rgba(255,255,255,0.18);
-      border-bottom: none;
-      pointer-events: none;
-      z-index: 0;
-    }
-  }
-}
-
-.zone-lbl {
-  display: block;
+/* ── Formación 4-3-3 ── */
+.form-header {
   text-align: center;
-  font-size: 0.5rem;
+  font-size: 0.62rem;
   font-weight: 900;
-  letter-spacing: 4px;
-  color: rgba(255,255,255,0.55);
-  text-shadow: 0 1px 4px rgba(0,0,0,0.9);
-  padding: 8px 0 3px;
-  text-transform: uppercase;
+  letter-spacing: 7px;
+  color: rgba(255,255,255,0.92);
+  text-shadow: 0 1px 6px rgba(0,0,0,0.8);
+  padding: 10px 0 2px;
   position: relative;
   z-index: 1;
 }
 
+.form-role-lbl {
+  text-align: center;
+  font-size: 0.46rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: rgba(255,255,255,0.42);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+  padding: 5px 0 1px;
+  position: relative;
+  z-index: 1;
+}
+
+.form-row {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  padding: 2px 8px 2px;
+  position: relative;
+  z-index: 1;
+  --zc: #FFE500;
+}
+
+.suplentes-section {
+  margin: 8px 0 0;
+  border-top: 2px dashed rgba(255,255,255,0.2);
+  padding: 6px 8px 8px;
+  position: relative;
+  z-index: 1;
+  --zc: rgba(255,255,255,0.7);
+}
+
+.suplentes-title {
+  text-align: center;
+  font-size: 0.52rem;
+  font-weight: 900;
+  letter-spacing: 5px;
+  color: rgba(255,255,255,0.55);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+  margin-bottom: 6px;
+}
+
+.suplentes-bench {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
+
+  .zone-seat {
+    min-width: 60px;
+    padding: 5px 5px;
+    .zs-emoji { font-size: 1.3rem; }
+    .zs-name  { font-size: 0.64rem; }
+    .zs-pts   { font-size: 0.68rem; }
+  }
+}
+
+/* Legacy zone-seats — kept for zone-seat reuse */
 .zone-seats {
   display: flex;
   justify-content: center;

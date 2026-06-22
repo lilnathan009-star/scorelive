@@ -298,29 +298,86 @@
       </div>
       }
 
-      <!-- ESTADIO EN CUENCO -->
-      @if (entries.length > 3) {
+      <!-- FORMACIÓN 4-3-3 -->
+      @if (entries.length > 0) {
       <div class="stadium-bowl">
         <div class="fl fl-l"></div>
         <div class="fl fl-r"></div>
-        @for (zone of stadiumZones; track zone.label) {
-          <div class="zone-row" [ngClass]="'zone-' + zone.zone">
-            <span class="zone-lbl">{{ zone.label }}</span>
-            <div class="zone-seats" [style.max-width.%]="zone.maxWidth">
-              @for (e of zone.entries; track e.user_id) {
-                <div class="zone-seat"
-                     [class.glow-up]="e.trend === 'up'"
-                     [class.glow-down]="e.trend === 'down'">
-                  <div class="zs-pos">{{ e.position }}</div>
-                  @if (e.trend === 'up')   { <div class="zs-trend up">↑</div> }
-                  @if (e.trend === 'down') { <div class="zs-trend dn">↓</div> }
-                  <div class="zs-emoji">{{ getPosEmoji(e.position ?? 99) }}</div>
-                  <div class="zs-name">{{ e.user_name.split(' ')[0] }}</div>
-                  <div class="zs-pts">{{ e.total_points }}<span>pts</span></div>
-                </div>
-              }
+
+        <div class="form-header">⚽ 11 INICIAL</div>
+
+        <div class="form-role-lbl">DELANTEROS</div>
+        <div class="form-row">
+          @for (e of entries.slice(0, 3); track e.user_id) {
+            <div class="zone-seat" [class.glow-up]="e.trend === 'up'" [class.glow-down]="e.trend === 'down'">
+              <div class="zs-pos">{{ e.position }}</div>
+              @if (e.trend === 'up')   { <div class="zs-trend up">↑</div> }
+              @if (e.trend === 'down') { <div class="zs-trend dn">↓</div> }
+              <div class="zs-emoji">{{ getPosEmoji(e.position ?? 99) }}</div>
+              <div class="zs-name">{{ e.user_name.split(' ')[0] }}</div>
+              <div class="zs-pts">{{ e.total_points }}<span>pts</span></div>
             </div>
+          }
+        </div>
+
+        <div class="form-role-lbl">MEDIOCAMPO</div>
+        <div class="form-row">
+          @for (e of entries.slice(3, 6); track e.user_id) {
+            <div class="zone-seat" [class.glow-up]="e.trend === 'up'" [class.glow-down]="e.trend === 'down'">
+              <div class="zs-pos">{{ e.position }}</div>
+              @if (e.trend === 'up')   { <div class="zs-trend up">↑</div> }
+              @if (e.trend === 'down') { <div class="zs-trend dn">↓</div> }
+              <div class="zs-emoji">{{ getPosEmoji(e.position ?? 99) }}</div>
+              <div class="zs-name">{{ e.user_name.split(' ')[0] }}</div>
+              <div class="zs-pts">{{ e.total_points }}<span>pts</span></div>
+            </div>
+          }
+        </div>
+
+        <div class="form-role-lbl">DEFENSAS</div>
+        <div class="form-row">
+          @for (e of entries.slice(6, 10); track e.user_id) {
+            <div class="zone-seat" [class.glow-up]="e.trend === 'up'" [class.glow-down]="e.trend === 'down'">
+              <div class="zs-pos">{{ e.position }}</div>
+              @if (e.trend === 'up')   { <div class="zs-trend up">↑</div> }
+              @if (e.trend === 'down') { <div class="zs-trend dn">↓</div> }
+              <div class="zs-emoji">{{ getPosEmoji(e.position ?? 99) }}</div>
+              <div class="zs-name">{{ e.user_name.split(' ')[0] }}</div>
+              <div class="zs-pts">{{ e.total_points }}<span>pts</span></div>
+            </div>
+          }
+        </div>
+
+        <div class="form-role-lbl">PORTERO</div>
+        <div class="form-row">
+          @for (e of entries.slice(10, 11); track e.user_id) {
+            <div class="zone-seat" [class.glow-up]="e.trend === 'up'" [class.glow-down]="e.trend === 'down'">
+              <div class="zs-pos">{{ e.position }}</div>
+              @if (e.trend === 'up')   { <div class="zs-trend up">↑</div> }
+              @if (e.trend === 'down') { <div class="zs-trend dn">↓</div> }
+              <div class="zs-emoji">{{ getPosEmoji(e.position ?? 99) }}</div>
+              <div class="zs-name">{{ e.user_name.split(' ')[0] }}</div>
+              <div class="zs-pts">{{ e.total_points }}<span>pts</span></div>
+            </div>
+          }
+        </div>
+
+        @if (entries.length > 11) {
+        <div class="suplentes-section">
+          <div class="suplentes-title">SUPLENTES</div>
+          <div class="suplentes-bench">
+            @for (e of entries.slice(11); track e.user_id) {
+              <div class="zone-seat" [class.glow-up]="e.trend === 'up'" [class.glow-down]="e.trend === 'down'">
+                <div class="zs-pos">{{ e.position }}</div>
+                @if (e.trend === 'up')   { <div class="zs-trend up">↑</div> }
+                @if (e.trend === 'down') { <div class="zs-trend dn">↓</div> }
+                <div class="zs-emoji">{{ getPosEmoji(e.position ?? 99) }}</div>
+                <div class="zs-name">{{ e.user_name.split(' ')[0] }}</div>
+                <div class="zs-pts">{{ e.total_points }}<span>pts</span></div>
+              </div>
+            }
           </div>
+        </div>
         }
       </div>
       }
