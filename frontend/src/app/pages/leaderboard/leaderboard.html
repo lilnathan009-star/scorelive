@@ -345,7 +345,7 @@
             <div class="form-role-lbl">DEFENSAS</div>
             <div class="form-row">
               @for (e of entries.slice(6, 10); track e.user_id; let i = $index) {
-                <div class="zone-seat" [class.glow-up]="e.trend === 'up'" [class.glow-down]="e.trend === 'down'">
+                <div class="zone-seat" [class.glow-up]="e.trend === 'up'" [class.glow-down]="e.trend === 'down'" [class.lb-advance]="i === 0 || i === 3">
                   <div class="zs-role">{{ getRole('def', i) }}</div>
                   <div class="zs-pos">{{ e.position }}</div>
                   @if (e.trend === 'up')   { <div class="zs-trend up">↑</div> }
