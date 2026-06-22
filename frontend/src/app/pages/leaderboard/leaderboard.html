@@ -326,7 +326,7 @@
 
           <div class="form-section">
             <div class="form-role-lbl">MEDIOCAMPO</div>
-            <div class="form-row">
+            <div class="form-row form-row-mid">
               @for (e of entries.slice(3, 6); track e.user_id; let i = $index) {
                 <div class="zone-seat" [class.glow-up]="e.trend === 'up'" [class.glow-down]="e.trend === 'down'" [class.cm-drop]="i === 1">
                   <div class="zs-role">{{ getRole('mid', i) }}</div>
