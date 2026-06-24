@@ -247,7 +247,7 @@
         <div class="tercero-row" [class.qualifies]="i < 8">
           <span class="t-rank">{{ i + 1 }}</span>
           <span class="t-group">{{ t.group }}</span>
-          <img class="t-flag" [src]="getFlagUrl(t.team)" [alt]="t.tla" onerror="this.style.display='none'" />
+          <img class="t-flag" [src]="getFlagUrl(t.team)" [alt]="t.tla" onerror="this.style.visibility='hidden'" />
           <span class="t-tla">{{ t.tla }}</span>
           <span class="t-pts">{{ t.points }}</span>
           <span class="t-gd" [class.pos]="t.gd > 0" [class.neg]="t.gd < 0">{{ t.gd > 0 ? '+' : '' }}{{ t.gd }}</span>
