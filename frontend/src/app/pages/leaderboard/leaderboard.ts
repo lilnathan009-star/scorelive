@@ -87,6 +87,7 @@ export class Leaderboard implements OnInit, OnDestroy {
     this.cargarLeaderboard();
     this.pollInterval = setInterval(() => this.cargarLeaderboard(), 5000);
     this.loadStats();
+    this.loadWCData();
 
     // Leaderboard via socket
     this.subs.push(
@@ -347,6 +348,17 @@ export class Leaderboard implements OnInit, OnDestroy {
 
   get groupNames(): string[] {
     return this.wcStandings.map(g => g.group);
+  }
+
+  get bestThirds(): any[] {
+    return this.wcStandings
+      .map(g => {
+        const third = g.table?.[2];
+        if (!third) return null;
+        return { ...third, group: g.group.replace('Group ', '') };
+      })
+      .filter(Boolean)
+      .sort((a: any, b: any) => b.points - a.points || b.gd - a.gd || (b.goalsFor ?? 0) - (a.goalsFor ?? 0));
   }
 
   getFlagFromCrest(crest: string, teamName: string): string {
