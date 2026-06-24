@@ -402,10 +402,10 @@
     <!-- ══ SIDEBAR DERECHA ══ -->
     <div class="lb-sidebar">
 
-      <!-- MATCH CARD -->
-      @if (currentMatch) {
-      <div class="sb-match" [class.is-live]="isLive(currentMatch)" (click)="openPredModal(currentMatch)">
-        @if (isLive(currentMatch)) {
+      <!-- MATCH CARDS (uno por partido) -->
+      @for (match of liveMatches; track match.id) {
+      <div class="sb-match" [class.is-live]="isLive(match)" (click)="openPredModal(match)">
+        @if (isLive(match)) {
           <div class="sb-match-header">
             <span class="pulsing-badge">EN VIVO</span>
           </div>
@@ -414,49 +414,50 @@
         }
         <div class="sb-match-score">
           <div class="sb-team">
-            @if (getFlagUrl(currentMatch.home_team)) {
-              <img [src]="getFlagUrl(currentMatch.home_team)" [alt]="currentMatch.home_team" />
+            @if (getFlagUrl(match.home_team)) {
+              <img [src]="getFlagUrl(match.home_team)" [alt]="match.home_team" />
             }
-            <span>{{ currentMatch.home_team }}</span>
+            <span>{{ match.home_team }}</span>
           </div>
           <div class="sb-score-center">
-            @if (currentMatch.home_score !== null && currentMatch.away_score !== null) {
-              <div class="sb-score-nums">{{ currentMatch.home_score }} - {{ currentMatch.away_score }}</div>
+            @if (match.home_score !== null && match.away_score !== null) {
+              <div class="sb-score-nums">{{ match.home_score }} - {{ match.away_score }}</div>
             } @else {
               <div class="sb-score-nums">VS</div>
             }
-            @if (isLive(currentMatch)) {
-              @if (currentMatch.period === 'HT') {
+            @if (isLive(match)) {
+              @if (match.period === 'HT') {
                 <div class="sb-minute">⏸ MT</div>
-              } @else if (getESPNClock(currentMatch)) {
-                <div class="sb-minute">⏱ {{ getESPNClock(currentMatch) }}</div>
+              } @else if (getESPNClock(match)) {
+                <div class="sb-minute">⏱ {{ getESPNClock(match) }}</div>
               } @else {
                 <div class="sb-minute">● EN VIVO</div>
               }
             } @else {
-              <div class="sb-minute muted">{{ formatMatchTime(currentMatch) }}</div>
+              <div class="sb-minute muted">{{ formatMatchTime(match) }}</div>
             }
           </div>
           <div class="sb-team right">
-            @if (getFlagUrl(currentMatch.away_team)) {
-              <img [src]="getFlagUrl(currentMatch.away_team)" [alt]="currentMatch.away_team" />
+            @if (getFlagUrl(match.away_team)) {
+              <img [src]="getFlagUrl(match.away_team)" [alt]="match.away_team" />
             }
-            <span>{{ currentMatch.away_team }}</span>
+            <span>{{ match.away_team }}</span>
           </div>
         </div>
-        @if (recentChanges.length > 0) {
-        <div class="sb-changes">
-          <div class="sb-changes-title">ÚLTIMOS CAMBIOS</div>
-          @for (ch of recentChanges; track ch.user_id) {
-            <div class="sb-change-row">
-              <span class="sb-ch-emoji">{{ getPosEmoji(ch.position) }}</span>
-              <span class="sb-ch-name">{{ ch.user_name.split(' ')[0] }}</span>
-              <span class="sb-ch-delta" [class.pos]="ch.delta > 0" [class.neg]="ch.delta < 0">
-                {{ ch.delta > 0 ? '+' : '' }}{{ ch.delta }} pts
-              </span>
-            </div>
-          }
-        </div>
+      </div>
+      }
+
+      @if (recentChanges.length > 0) {
+      <div class="sb-changes">
+        <div class="sb-changes-title">ÚLTIMOS CAMBIOS</div>
+        @for (ch of recentChanges; track ch.user_id) {
+          <div class="sb-change-row">
+            <span class="sb-ch-emoji">{{ getPosEmoji(ch.position) }}</span>
+            <span class="sb-ch-name">{{ ch.user_name.split(' ')[0] }}</span>
+            <span class="sb-ch-delta" [class.pos]="ch.delta > 0" [class.neg]="ch.delta < 0">
+              {{ ch.delta > 0 ? '+' : '' }}{{ ch.delta }} pts
+            </span>
+          </div>
         }
       </div>
       }
