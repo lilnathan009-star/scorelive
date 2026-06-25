@@ -709,6 +709,15 @@ export class Leaderboard implements OnInit, OnDestroy {
       { emoji: '😎', text: `${L} en modo vacaciones mentales. Sigue primero igual.` },
       { emoji: '🏆', text: `${L} ya eligió dónde pone el trofeo. Que no se confíe.` },
       { emoji: '🤩', text: `${L} brilla desde el #1. Pero el torneo no terminó.` },
+      { emoji: '🍑', text: `${L} arriba de todos. Así le gusta estar.` },
+      { emoji: '🧘', text: `${L} ni suda. Los demás chorreando.` },
+      { emoji: '🐓', text: `${L} canta primero y canta más duro que todos.` },
+      { emoji: '🌡️', text: `${L} tiene los pronósticos calientes. El resto congelados.` },
+      { emoji: '💆', text: `${L} se da masajes en el primer puesto. Muy cómodo ahí.` },
+      { emoji: '🦁', text: `${L} rugiendo en la cima. Difícil de tumbar pero no imposible.` },
+      { emoji: '🎻', text: `${L} toca el primer violín. Los demás ponen el ritmo.` },
+      { emoji: '😇', text: `${L} ni reza antes de cada partido. Tampoco lo necesita.` },
+      { emoji: '🛁', text: `${L} metido en la bañera de puntos. A gusto total.` },
     );
 
     // ── Segundo ──
@@ -722,6 +731,11 @@ export class Leaderboard implements OnInit, OnDestroy {
         { emoji: '😒', text: `${S} harto del segundo lugar. Pero ahí sigue.` },
         { emoji: '🫠', text: `${S} a ${d01} pts del primero. ${d01 <= 5 ? 'Alcanzable.' : 'Lejos.'}` },
         { emoji: '🤬', text: `${S} internamente destruido. Externamente sonríe.` },
+        { emoji: '🚿', text: `${S} tan cerca de ${L} que casi le lava la espalda.` },
+        { emoji: '👃', text: `${S} oliendo los talones de ${L}. A ver si alcanza.` },
+        { emoji: '🛏️', text: `${S} duerme en el segundo piso. Quiere el penthouse.` },
+        { emoji: '📮', text: `${S} siempre entrega primero pero llega segundo. Cruel.` },
+        { emoji: '🪞', text: `${S} se mira al espejo y ve al futuro campeón. Por ahora solo ve el segundo.` },
       );
     }
 
@@ -735,6 +749,9 @@ export class Leaderboard implements OnInit, OnDestroy {
         { emoji: '😬', text: `${T} mirando arriba y abajo al mismo tiempo.` },
         { emoji: '🥉', text: `${T} tiene medalla pero quiere más. Normal.` },
         { emoji: '👁️', text: `${T} a ${d12} pts del segundo. La matemática existe.` },
+        { emoji: '🎸', text: `${T} toca bien pero no es el solista. Todavía.` },
+        { emoji: '🌡️', text: `${T} tibio en el podio. Ni frío ni caliente. Peligroso.` },
+        { emoji: '🕯️', text: `${T} en bronce, encendido. El fuego puede crecer.` },
       );
     }
 
@@ -747,6 +764,10 @@ export class Leaderboard implements OnInit, OnDestroy {
         { emoji: '😡', text: `${C} fuera del podio otra vez. La rabia se acumula.` },
         { emoji: '🫤', text: `${C} en cuarto. Ni chicha ni limonada.` },
         { emoji: '🔥', text: `${C} a punto de entrar al podio. O no. Quién sabe.` },
+        { emoji: '🚪', text: `${C} tocando la puerta del podio. Nadie abre.` },
+        { emoji: '🪑', text: `${C} sin silla en el podio. La música paró justo antes.` },
+        { emoji: '4️⃣', text: `${C} en cuarto. El número más ingrato del fútbol.` },
+        { emoji: '😮‍💨', text: `${C} suspirando fuerte desde el cuarto escalón.` },
       );
     }
 
@@ -757,6 +778,9 @@ export class Leaderboard implements OnInit, OnDestroy {
         { emoji: '👀', text: `${Q} en quinto. Acechando. Siempre acechando.` },
         { emoji: '🤙', text: `${Q} a un partido de cambiar todo. Eso dicen todos.` },
         { emoji: '🎲', text: `${Q} necesita que los de arriba fallen. El fútbol es así.` },
+        { emoji: '🕵️', text: `${Q} en quinto, peligroso cuando nadie lo ve.` },
+        { emoji: '🐍', text: `${Q} en modo serpiente. Quieto pero listo para morder.` },
+        { emoji: '🥊', text: `${Q} calentando los puños. El podio que cuide la espalda.` },
       );
     }
 
@@ -769,6 +793,8 @@ export class Leaderboard implements OnInit, OnDestroy {
           { emoji: '🤝', text: `${A} y ${B} igualados en puntos. Solo el desempate los separa.` },
           { emoji: '⚖️', text: `${A} y ${B} empatados. El próximo partido decide.` },
           { emoji: '😳', text: `${A} y ${B} con los mismos puntos. Tensión máxima.` },
+          { emoji: '🫱🫲', text: `${A} y ${B} juntos en puntos. Pero solo uno puede quedar arriba.` },
+          { emoji: '🥊', text: `${A} y ${B} igualados. La próxima jornada los separa.` },
         );
       } else if (d <= 2) {
         pool.push(
@@ -776,17 +802,22 @@ export class Leaderboard implements OnInit, OnDestroy {
           { emoji: '🔥', text: `${B} persigue a ${A} con ${d} pt${d > 1 ? 's' : ''}. Modo cazador.` },
           { emoji: '😰', text: `${A} con ${d} pt${d > 1 ? 's' : ''} sobre ${B}. Duerme mal.` },
           { emoji: '💣', text: `${A} vs ${B}: ${d} pt${d > 1 ? 's' : ''} de diferencia. Esto explota.` },
+          { emoji: '🔫', text: `${A} y ${B} afilando los cuchillos. Solo queda uno en pie.` },
+          { emoji: '🧨', text: `${A} y ${B} con ${d} pt${d > 1 ? 's' : ''} de diferencia. Dinamita pura.` },
         );
       } else if (d <= 5) {
         pool.push(
           { emoji: '👀', text: `${B} a ${d} pts de ${A}. Se viene.` },
           { emoji: '🏃', text: `${B} corriendo detrás de ${A}. La distancia se cierra.` },
           { emoji: '😤', text: `${A} siente el aliento de ${B}. Son ${d} pts.` },
+          { emoji: '🎯', text: `${B} apunta directo a ${A}. Buena puntería.` },
+          { emoji: '🐕', text: `${B} detrás de ${A} como perro en cacería. No suelta.` },
         );
       } else if (d <= 10) {
         pool.push(
           { emoji: '🎯', text: `${B} a ${d} pts de ${A}. Lejos pero no imposible.` },
           { emoji: '🤔', text: `${A} cómodo ${d} pts sobre ${B}. Por ahora.` },
+          { emoji: '🔭', text: `${B} necesita telescopio para ver a ${A}. ${d} pts de distancia.` },
         );
       }
     }
@@ -801,6 +832,11 @@ export class Leaderboard implements OnInit, OnDestroy {
         { emoji: '🔝', text: `${R} en racha. Algo hizo bien esta vez.` },
         { emoji: '💥', text: `${R} explotó esta jornada. No para.` },
         { emoji: '🎯', text: `${R} acertando de a poco. Va escalando.` },
+        { emoji: '🌶️', text: `${R} picante esta jornada. Quema desde abajo.` },
+        { emoji: '🎣', text: `${R} pescando puntos mientras otros ven el río pasar.` },
+        { emoji: '🏋️', text: `${R} levantó puntos esta ronda. Bien pesados.` },
+        { emoji: '⬆️', text: `${R} para arriba como los precios. Sin parar.` },
+        { emoji: '🔑', text: `${R} encontró la llave. Ahora a ver qué puerta abre.` },
       );
     }
 
@@ -814,6 +850,12 @@ export class Leaderboard implements OnInit, OnDestroy {
         { emoji: '📉', text: `${F} bajando. Así es el fútbol, amigo.` },
         { emoji: '😬', text: `${F} eligió mal. Todos elegimos mal a veces.` },
         { emoji: '🥲', text: `${F} dice que tenía razón pero la tabla no opina lo mismo.` },
+        { emoji: '🛝', text: `${F} en tobogán. Hacia abajo y sin frenos.` },
+        { emoji: '🧊', text: `${F} más frío que sus pronósticos. Y eso ya es decir.` },
+        { emoji: '💸', text: `${F} botó los puntos como si sobraran. No sobraban.` },
+        { emoji: '🚽', text: `Los puntos de ${F} fueron directo al drenaje esta jornada.` },
+        { emoji: '🪁', text: `${F} apuntó, lanzó y falló. Qué puntería la de él.` },
+        { emoji: '🎪', text: `${F} convirtió su pronóstico en un show. Lástima que nadie aplaudió.` },
       );
     }
 
@@ -826,6 +868,11 @@ export class Leaderboard implements OnInit, OnDestroy {
         { emoji: '🤔', text: `${M} lleva jornadas sin moverse. El hombre del statu quo.` },
         { emoji: '🎭', text: `${M} en el medio del drama sin ser parte del drama.` },
         { emoji: '⏳', text: `${M} esperando su momento. Sigue esperando.` },
+        { emoji: '🥙', text: `${M} en el relleno del sándwich. Sin ser pan ni carne.` },
+        { emoji: '🚦', text: `${M} en amarillo permanente. Ni avanza ni retrocede.` },
+        { emoji: '🫥', text: `${M} invisible desde la mitad. Ni amenaza ni sufre. Raro.` },
+        { emoji: '🐠', text: `${M} nadando en el medio del banco. Tranquilo pero perdido.` },
+        { emoji: '📻', text: `${M} en la frecuencia del medio. Sin señal clara.` },
       );
     }
 
@@ -837,6 +884,10 @@ export class Leaderboard implements OnInit, OnDestroy {
         { emoji: '🆘', text: `${P} necesita puntos urgente. Urgentísimo.` },
         { emoji: '😓', text: `${P} mirando la tabla y preferiría no mirarla.` },
         { emoji: '🙈', text: `${P} cerró los ojos y la tabla sigue igual.` },
+        { emoji: '🕳️', text: `${P} cayendo en el hoyo. Y el hoyo es profundo.` },
+        { emoji: '🔦', text: `${P} necesita linterna para ver la salida desde donde está.` },
+        { emoji: '⛏️', text: `${P} cavando hacia arriba. Largo el camino que viene.` },
+        { emoji: '🍺', text: `${P} ya pidió otra en la barra del fondo. Que alivie.` },
       );
     }
 
@@ -851,6 +902,16 @@ export class Leaderboard implements OnInit, OnDestroy {
       { emoji: '🎰', text: `${UL} arriesgó en todos los partidos. Así salió.` },
       { emoji: '😵', text: `${UL} revisando qué salió mal. Spoiler: todo.` },
       { emoji: '🌱', text: `${UL} en el último lugar pero el torneo no terminó.` },
+      { emoji: '🏗️', text: `${UL} construyendo desde los cimientos. Muy desde los cimientos.` },
+      { emoji: '📡', text: `Los puntos de ${UL} no tienen señal. Se perdieron en el camino.` },
+      { emoji: '🧯', text: `${UL} apagando incendios con más incendios. No funciona.` },
+      { emoji: '🐢', text: `${UL} va a su ritmo. Muy. Su. Ritmo.` },
+      { emoji: '🌋', text: `${UL} necesita una erupción de puntos. Urgente.` },
+      { emoji: '🏚️', text: `${UL} vive en el sótano. Hay peores barrios, dicen.` },
+      { emoji: '🥚', text: `${UL} prometió huevos y entregó cáscaras. Partido tras partido.` },
+      { emoji: '🎪', text: `${UL} ha hecho del último lugar su propio circo. Función diaria.` },
+      { emoji: '🫳', text: `${UL} soltando todo esta jornada. Puntos incluidos.` },
+      { emoji: '🔋', text: `${UL} en rojo total. Sin batería, sin puntos, sin explicación.` },
     );
 
     return pool;
