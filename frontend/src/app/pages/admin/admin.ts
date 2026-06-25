@@ -60,7 +60,14 @@ export class Admin implements OnInit {
   constructor(private api: ApiService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
-    this.api.getTournaments().subscribe(t => this.tournaments = t);
+    this.api.getTournaments().subscribe(t => {
+      this.tournaments = t;
+      // Auto-seleccionar el primer torneo (Mundial 2026)
+      if (t.length > 0 && !this.selectedTournamentId) {
+        this.selectTournament(t[0].id);
+      }
+      this.cdr.detectChanges();
+    });
     this.api.getUsers().subscribe(u => { this.users = u; this.cdr.detectChanges(); });
   }
 
