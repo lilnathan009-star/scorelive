@@ -152,7 +152,7 @@ export class Leaderboard implements OnInit, OnDestroy {
     this.zone.runOutsideAngular(() => {
       this.pollInterval = setInterval(() => this.cargarLeaderboard(), 5000);
       this.matchPollInterval = setInterval(() => this.cargarPartidosVivos(), 30000);
-      this.espnInterval = setInterval(() => this.pollESPNClock(), 15000);
+      this.espnInterval = setInterval(() => { this.pollESPNClock(); this.refreshStandings(); }, 15000);
     });
 
     // Leaderboard via socket
@@ -377,6 +377,13 @@ export class Leaderboard implements OnInit, OnDestroy {
       this.loadWCData();
     }
     this.cdr.detectChanges();
+  }
+
+  refreshStandings() {
+    this.http.get<any[]>('/api/football/standings').subscribe({
+      next: data => { this.wcStandings = data; this.cdr.detectChanges(); },
+      error: () => {}
+    });
   }
 
   loadWCData() {
