@@ -180,7 +180,7 @@ export class Leaderboard implements OnInit, OnDestroy {
     this.subs.push(
       this.socketService.onLiveMatchesList().subscribe(list => {
         const prevLen = this.liveMatches.length;
-        this.liveMatches = list;
+        this.liveMatches = list.sort((a: LiveMatch, b: LiveMatch) => a.id - b.id);
         // Si el índice actual ya no existe, volver al primero
         if (this.currentMatchIdx >= this.liveMatches.length) {
           this.currentMatchIdx = 0;
@@ -269,7 +269,7 @@ export class Leaderboard implements OnInit, OnDestroy {
   cargarPartidosVivos() {
     this.http.get<LiveMatch[]>('/api/matches/live').subscribe({
       next: data => {
-        this.liveMatches = data;
+        this.liveMatches = data.sort((a: LiveMatch, b: LiveMatch) => a.id - b.id);
         if (this.currentMatchIdx >= this.liveMatches.length) {
           this.currentMatchIdx = 0;
         }
