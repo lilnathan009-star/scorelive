@@ -650,12 +650,14 @@ export class Leaderboard implements OnInit, OnDestroy {
         pool.push({ emoji: '😬', text: `${ns} y otros apostaron por ${loser}. ${winner} los dejó fríos.` });
       } else if (loser && betLoser.length > total * 0.55) {
         pool.push({ emoji: '💀', text: `${betLoser.length} de ${total} apostaron por ${loser}. ${winner} ganó. Masacre colectiva.` });
+        pool.push({ emoji: '😤', text: `${winner} era el que nadie quería. Arrecho nunca muere, y si muere, muere arrecho ñaño.` });
       }
 
       // ── Pocos apostaron por el ganador ──
       if (winner && betWinner.length > 0 && betWinner.length <= 3 && total > 5) {
         const ns = betWinner.slice(0, 2).map((p: any) => fn(p.user_name)).join(' y ');
         pool.push({ emoji: '🦅', text: `Solo ${betWinner.length} creyeron en ${winner}. ${ns} entre ellos. Cobraron bien.` });
+        pool.push({ emoji: '😤', text: `${winner} ganó y casi nadie lo vio venir. Arrecho nunca muere, y si muere, muere arrecho broder.` });
       }
 
       // ── Todos apostaron por el ganador ──
@@ -669,6 +671,7 @@ export class Leaderboard implements OnInit, OnDestroy {
         pool.push({ emoji: '🥲', text: `${ns} sacó 0 puntos en ${hN} vs ${aN}. Día para olvidar.` });
       } else if (zeroPoints.length > 4) {
         pool.push({ emoji: '💥', text: `${zeroPoints.length} jugadores se fueron con cero en ${hN} vs ${aN}. Nadie lo vio venir.` });
+        pool.push({ emoji: '😤', text: `${hN} vs ${aN} dejó a ${zeroPoints.length} con cero. Arrecho nunca muere, y si muere, muere arrecho. Pero este marcador mató a todos.` });
       }
 
       // ── Empate ──
@@ -742,6 +745,7 @@ export class Leaderboard implements OnInit, OnDestroy {
       { emoji: '🎉', text: `${L} de farra en el primer puesto. Que dure la farra.` },
       { emoji: '🦅', text: `${L} volando de ley sobre todos. Pilas los que quieren alcanzarle.` },
       { emoji: '🤩', text: `${L} bien embalado pana. Qué mejor estar así de arriba.` },
+      { emoji: '😤', text: `${L} primero y sin dar señales de bajar. Arrecho nunca muere, y si muere, muere arrecho ñaño.` },
     );
 
     // ── Segundo ──
@@ -912,6 +916,7 @@ export class Leaderboard implements OnInit, OnDestroy {
         { emoji: '🎯', text: `${R} pilas esta jornada. De ley que no para.` },
         { emoji: '🔥', text: `${R} en farra de puntos. No para ni a tomar trago.` },
         { emoji: '😤', text: `${R} arrecho para arriba. Qué mejor cuando así se pone.` },
+        { emoji: '😤', text: `${R} subiendo sin parar. Arrecho nunca muere, y si muere, muere arrecho broder.` },
       );
     }
 
