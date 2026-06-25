@@ -725,6 +725,15 @@ export class Leaderboard implements OnInit, OnDestroy {
       { emoji: '🎻', text: `${L} toca el primer violín. Los demás ponen el ritmo.` },
       { emoji: '😇', text: `${L} ni reza antes de cada partido. Tampoco lo necesita.` },
       { emoji: '🛁', text: `${L} metido en la bañera de puntos. A gusto total.` },
+      { emoji: '🐔', text: `${L} está como el gallo del barrio. Nadie se mete. Por ahora.` },
+      { emoji: '💪', text: `${L} está teso pana. Duro de bajar ese man.` },
+      { emoji: '😏', text: `${L} bien subido arriba de todos. Así nomás ñaño.` },
+      { emoji: '🌶️', text: `${L} picante en la cima. Que le paren si pueden.` },
+      { emoji: '🤙', text: `${L} ni se enferma de nervios. Ese es el man.` },
+      { emoji: '🍺', text: `${L} en primero y ya brindando con caña. Que no se le suban los humos.` },
+      { emoji: '🎯', text: `${L} la tiene bacán nomás. Los demás viendo cómo.` },
+      { emoji: '🦅', text: `${L} volando solo en el primer lugar. De caña ese man.` },
+      { emoji: '😤', text: `${L} bien arrecho arriba. Bajarlo va a costar.` },
     );
 
     // ── Segundo ──
@@ -743,6 +752,12 @@ export class Leaderboard implements OnInit, OnDestroy {
         { emoji: '🛏️', text: `${S} duerme en el segundo piso. Quiere el penthouse.` },
         { emoji: '📮', text: `${S} siempre entrega primero pero llega segundo. Cruel.` },
         { emoji: '🪞', text: `${S} se mira al espejo y ve al futuro campeón. Por ahora solo ve el segundo.` },
+        { emoji: '🔥', text: `${S} caliente como la caña de Otavalo. Pero aún no quema al primero.` },
+        { emoji: '😤', text: `${S} tan cerca que le huele el champú a ${L}. Falta poco ñaño.` },
+        { emoji: '🥈', text: `${S} coleccionando plata. Alguien tiene que hacerlo pana.` },
+        { emoji: '💀', text: `${S} dice que no le molesta el segundo. Le molesta y harto.` },
+        { emoji: '🐕', text: `${S} siguiendo a ${L} paso a paso. Como perro fiel pero con ganas de morder.` },
+        { emoji: '😒', text: `${S} en segundo otra vez. Ya fue pana, pero el torneo no ha acabado.` },
       );
     }
 
@@ -759,6 +774,9 @@ export class Leaderboard implements OnInit, OnDestroy {
         { emoji: '🎸', text: `${T} toca bien pero no es el solista. Todavía.` },
         { emoji: '🌡️', text: `${T} tibio en el podio. Ni frío ni caliente. Peligroso.` },
         { emoji: '🕯️', text: `${T} en bronce, encendido. El fuego puede crecer.` },
+        { emoji: '😏', text: `${T} de tercero pero con caña. Los del podio que se cuiden.` },
+        { emoji: '🤫', text: `${T} chambea callado desde el tercero. Eso es lo peligroso.` },
+        { emoji: '🧲', text: `${T} pegadito al podio. Nomás no llega al segundo todavía.` },
       );
     }
 
@@ -775,6 +793,9 @@ export class Leaderboard implements OnInit, OnDestroy {
         { emoji: '🪑', text: `${C} sin silla en el podio. La música paró justo antes.` },
         { emoji: '4️⃣', text: `${C} en cuarto. El número más ingrato del fútbol.` },
         { emoji: '😮‍💨', text: `${C} suspirando fuerte desde el cuarto escalón.` },
+        { emoji: '🤦', text: `${C} fuera del podio. Qué macana man.` },
+        { emoji: '😡', text: `${C} arrecho con la tabla. La tabla no le hace caso.` },
+        { emoji: '🍺', text: `${C} pidió caña para el dolor del cuarto puesto. La segunda ronda.` },
       );
     }
 
@@ -788,6 +809,9 @@ export class Leaderboard implements OnInit, OnDestroy {
         { emoji: '🕵️', text: `${Q} en quinto, peligroso cuando nadie lo ve.` },
         { emoji: '🐍', text: `${Q} en modo serpiente. Quieto pero listo para morder.` },
         { emoji: '🥊', text: `${Q} calentando los puños. El podio que cuide la espalda.` },
+        { emoji: '🐍', text: `${Q} en modo serpiente serrana. Quieto pero listo.` },
+        { emoji: '😤', text: `${Q} bien arrecho desde el quinto. Eso es motivación nomás.` },
+        { emoji: '🎯', text: `${Q} tripea desde el quinto. Cuando llega, llega de caña.` },
       );
     }
 
@@ -802,6 +826,8 @@ export class Leaderboard implements OnInit, OnDestroy {
           { emoji: '😳', text: `${A} y ${B} con los mismos puntos. Tensión máxima.` },
           { emoji: '🫱🫲', text: `${A} y ${B} juntos en puntos. Pero solo uno puede quedar arriba.` },
           { emoji: '🥊', text: `${A} y ${B} igualados. La próxima jornada los separa.` },
+          { emoji: '🔥', text: `${A} y ${B} empatados ñaño. Eso duele más que perder solo.` },
+          { emoji: '😤', text: `${A} y ${B} igualitos. Los dos arrechos y los dos sin poder subir.` },
         );
       } else if (d <= 2) {
         pool.push(
@@ -811,6 +837,8 @@ export class Leaderboard implements OnInit, OnDestroy {
           { emoji: '💣', text: `${A} vs ${B}: ${d} pt${d > 1 ? 's' : ''} de diferencia. Esto explota.` },
           { emoji: '🔫', text: `${A} y ${B} afilando los cuchillos. Solo queda uno en pie.` },
           { emoji: '🧨', text: `${A} y ${B} con ${d} pt${d > 1 ? 's' : ''} de diferencia. Dinamita pura.` },
+          { emoji: '🌶️', text: `${A} y ${B} peleados más que mono y serrano. ${d} pt${d > 1 ? 's' : ''} nomás los separa.` },
+          { emoji: '😤', text: `${B} bien arrecho con ${A}. ${d} pt${d > 1 ? 's' : ''} de diferencia y ya se siente.` },
         );
       } else if (d <= 5) {
         pool.push(
@@ -819,6 +847,8 @@ export class Leaderboard implements OnInit, OnDestroy {
           { emoji: '😤', text: `${A} siente el aliento de ${B}. Son ${d} pts.` },
           { emoji: '🎯', text: `${B} apunta directo a ${A}. Buena puntería.` },
           { emoji: '🐕', text: `${B} detrás de ${A} como perro en cacería. No suelta.` },
+          { emoji: '🏃', text: `${B} corriendo al ${A} como cobrador de deudas. ${d} pts debe.` },
+          { emoji: '👀', text: `${B} mirando a ${A} como el perro mira el hueso. Ya va a morder.` },
         );
       } else if (d <= 10) {
         pool.push(
@@ -844,6 +874,12 @@ export class Leaderboard implements OnInit, OnDestroy {
         { emoji: '🏋️', text: `${R} levantó puntos esta ronda. Bien pesados.` },
         { emoji: '⬆️', text: `${R} para arriba como los precios. Sin parar.` },
         { emoji: '🔑', text: `${R} encontró la llave. Ahora a ver qué puerta abre.` },
+        { emoji: '🌶️', text: `${R} subiendo picante ñaño. Cuidado los de arriba.` },
+        { emoji: '💪', text: `${R} chambea duro esta jornada. Se nota y cómo.` },
+        { emoji: '🤙', text: `${R} de caña esta ronda. Ese man no para.` },
+        { emoji: '🐂', text: `${R} toro suelto subiendo la tabla. Que le paren.` },
+        { emoji: '🎯', text: `${R} metiéndola al ángulo esta jornada. Al pelo nomás.` },
+        { emoji: '😤', text: `${R} bien arrecho para arriba. Cuando se arrecha ese man no hay quien lo pare.` },
       );
     }
 
@@ -863,6 +899,14 @@ export class Leaderboard implements OnInit, OnDestroy {
         { emoji: '🚽', text: `Los puntos de ${F} fueron directo al drenaje esta jornada.` },
         { emoji: '🪁', text: `${F} apuntó, lanzó y falló. Qué puntería la de él.` },
         { emoji: '🎪', text: `${F} convirtió su pronóstico en un show. Lástima que nadie aplaudió.` },
+        { emoji: '🤦', text: `${F} falló más que un chiro en casino. Qué macana.` },
+        { emoji: '😭', text: `${F} más perdido que turista en la Mitad del Mundo.` },
+        { emoji: '🍺', text: `${F} esta jornada solo ganó sed. Y ni caña alivió el dolor.` },
+        { emoji: '🌊', text: `${F} surfeando el fondo de la tabla. Sin tabla.` },
+        { emoji: '🥲', text: `${F} se la pensó mucho, salió peor. Qué macana pana.` },
+        { emoji: '🎰', text: `${F} apostó con corazón de guambra. El fútbol no perdona eso.` },
+        { emoji: '💀', text: `${F} botó los puntos como volantes de descuento. Gratis y todo.` },
+        { emoji: '🤷', text: `${F} ya fue esta jornada. Que Dios y el próximo partido le ayuden.` },
       );
     }
 
@@ -880,6 +924,12 @@ export class Leaderboard implements OnInit, OnDestroy {
         { emoji: '🫥', text: `${M} invisible desde la mitad. Ni amenaza ni sufre. Raro.` },
         { emoji: '🐠', text: `${M} nadando en el medio del banco. Tranquilo pero perdido.` },
         { emoji: '📻', text: `${M} en la frecuencia del medio. Sin señal clara.` },
+        { emoji: '😴', text: `${M} echando siesta en el medio. Sin prisa, sin gloria pana.` },
+        { emoji: '🤷', text: `${M} ni arriba ni abajo. Como sánduche sin sal ñaño.` },
+        { emoji: '☕', text: `${M} en zona de confort tomando cafecito. El confort es el enemigo.` },
+        { emoji: '🦥', text: `${M} a paso de perezoso en el medio de la tabla. Llegarás... algún día.` },
+        { emoji: '🌫️', text: `${M} invisible desde la mitad. Como niebla de Quito.` },
+        { emoji: '🎭', text: `${M} actor de reparto en su propia pelicula mundialista.` },
       );
     }
 
@@ -895,6 +945,11 @@ export class Leaderboard implements OnInit, OnDestroy {
         { emoji: '🔦', text: `${P} necesita linterna para ver la salida desde donde está.` },
         { emoji: '⛏️', text: `${P} cavando hacia arriba. Largo el camino que viene.` },
         { emoji: '🍺', text: `${P} ya pidió otra en la barra del fondo. Que alivie.` },
+        { emoji: '😬', text: `${P} en zona de peligro. Qué macana la suya ñaño.` },
+        { emoji: '🌧️', text: `${P} más nublado que Quito en invierno. Todo gris por allá.` },
+        { emoji: '🥲', text: `${P} mirando la tabla pa que cambie sola. No cambia pana.` },
+        { emoji: '🤦', text: `${P} botó la bola esta jornada y le salió caro.` },
+        { emoji: '🆘', text: `${P} necesita puntos urgente. Urgentísimo ñaño. Ya.` },
       );
     }
 
@@ -919,6 +974,17 @@ export class Leaderboard implements OnInit, OnDestroy {
       { emoji: '🎪', text: `${UL} ha hecho del último lugar su propio circo. Función diaria.` },
       { emoji: '🫳', text: `${UL} soltando todo esta jornada. Puntos incluidos.` },
       { emoji: '🔋', text: `${UL} en rojo total. Sin batería, sin puntos, sin explicación.` },
+      { emoji: '💀', text: `${UL} tan abajo que los demás necesitan GPS para encontrarle.` },
+      { emoji: '🥲', text: `${UL} en el fondo del tanque. El fondo del fondo pana.` },
+      { emoji: '🍺', text: `${UL} ya pidió la caña más grande del local. Para olvidar nomás.` },
+      { emoji: '🤡', text: `${UL} apostó con corazón de guambra. El fútbol no tiene corazón ñaño.` },
+      { emoji: '😵', text: `${UL} más chiro de puntos que nadie. Cero, nada, ni uno.` },
+      { emoji: '🌋', text: `${UL} necesita una erupción de puntos. Del Cotopaxi pa arriba.` },
+      { emoji: '🧟', text: `${UL} sigue vivo en el torneo. Medio vivo pero vivo.` },
+      { emoji: '🏚️', text: `${UL} vive en el sótano de la tabla. Hay peores barrios dicen.` },
+      { emoji: '🤷', text: `${UL} ya fue pana. Pero el fútbol da revancha. A veces.` },
+      { emoji: '😤', text: `${UL} arrecho desde el último lugar. Esa rabia hay que meterla en los pronósticos.` },
+      { emoji: '🦆', text: `${UL} nadando en el fondo solo. Ni los patos le hacen compañía.` },
     );
 
     return pool;
