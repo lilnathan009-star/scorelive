@@ -7,7 +7,7 @@ async function autoImportUpcomingMatches() {
   try {
     // Obtener torneo activo
     const { rows: [tournament] } = await pool.query(
-      `SELECT id FROM tournaments ORDER BY id DESC LIMIT 1`
+      `SELECT id FROM tournaments ORDER BY id ASC LIMIT 1`
     );
     if (!tournament) return;
 
