@@ -926,6 +926,18 @@ export class Leaderboard implements OnInit, OnDestroy {
     this.groupPicksUser = '';
   }
 
+  getMatchProbs(match: LiveMatch | null): { home: number; draw: number; away: number } | null {
+    if (!match) return null;
+    const ev = this.espnEvents.find(e =>
+      e.home === match.home_team && e.away === match.away_team
+    );
+    if (ev?.homePct == null || ev?.awayPct == null) return null;
+    const home = Math.round(ev.homePct);
+    const away = Math.round(ev.awayPct);
+    const draw = Math.max(0, 100 - home - away);
+    return { home, draw, away };
+  }
+
   isPickCorrect(pick: any, team: string): boolean {
     if (!pick.result_team1) return false;
     return pick.result_team1 === team || pick.result_team2 === team;

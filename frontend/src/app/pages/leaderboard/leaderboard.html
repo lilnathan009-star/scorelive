@@ -629,6 +629,27 @@
           <button class="pred-close" (click)="closePredModal()">✕</button>
         </div>
 
+        @if (getMatchProbs(predModalMatch); as probs) {
+          <div class="prob-section">
+            <div class="prob-bar">
+              <div class="prob-seg prob-home" [style.width.%]="probs.home">
+                <span>{{ probs.home }}%</span>
+              </div>
+              <div class="prob-seg prob-draw" [style.width.%]="probs.draw">
+                @if (probs.draw >= 10) { <span>{{ probs.draw }}%</span> }
+              </div>
+              <div class="prob-seg prob-away" [style.width.%]="probs.away">
+                <span>{{ probs.away }}%</span>
+              </div>
+            </div>
+            <div class="prob-labels">
+              <span>{{ teamEs(predModalMatch!.home_team) }}</span>
+              <span>Empate</span>
+              <span>{{ teamEs(predModalMatch!.away_team) }}</span>
+            </div>
+          </div>
+        }
+
         @if (predModalLoading) {
           <div class="pred-state">Cargando...</div>
         } @else if (predModalPreds.length === 0) {

@@ -1543,6 +1543,59 @@
   flex-shrink: 0;
 }
 
+/* ── Barra de probabilidades ESPN ── */
+.prob-section {
+  padding: 10px 16px 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.prob-bar {
+  display: flex;
+  border-radius: 6px;
+  overflow: hidden;
+  height: 28px;
+}
+
+.prob-seg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  transition: width 0.4s ease;
+  min-width: 0;
+
+  span { white-space: nowrap; }
+
+  &.prob-home {
+    background: #00D4B0;
+    color: #000;
+    border-radius: 6px 0 0 6px;
+    justify-content: flex-start;
+    padding-left: 8px;
+  }
+  &.prob-draw {
+    background: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.7);
+  }
+  &.prob-away {
+    background: #E84030;
+    color: #fff;
+    border-radius: 0 6px 6px 0;
+    justify-content: flex-end;
+    padding-right: 8px;
+  }
+}
+
+.prob-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: rgba(255,255,255,0.4);
+  margin-top: 4px;
+  padding: 0 2px;
+}
+
 .pred-modal-titles {
   display: flex;
   flex-direction: column;

@@ -58,6 +58,10 @@ function mapEvent(comp, event) {
       red:     d.redCard,
     }));
 
+  const pred = comp.predictor;
+  const homePct = pred?.homeTeam?.teamChancePct ?? pred?.homeTeam?.gameProjection ?? null;
+  const awayPct = pred?.awayTeam?.teamChancePct ?? pred?.awayTeam?.gameProjection ?? null;
+
   return {
     espnId:      comp.id,
     date:        comp.startDate,
@@ -70,6 +74,8 @@ function mapEvent(comp, event) {
     awayScore:   away?.score != null ? parseInt(away.score) : null,
     homeLogo:    home?.team?.logo ?? '',
     awayLogo:    away?.team?.logo ?? '',
+    homePct:     homePct != null ? parseFloat(homePct) : null,
+    awayPct:     awayPct != null ? parseFloat(awayPct) : null,
     goals,
     cards,
   };
