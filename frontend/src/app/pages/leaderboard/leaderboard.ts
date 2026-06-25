@@ -931,11 +931,12 @@ export class Leaderboard implements OnInit, OnDestroy {
     const ev = this.espnEvents.find(e =>
       e.home === match.home_team && e.away === match.away_team
     );
-    if (ev?.homePct == null || ev?.awayPct == null) return null;
-    const home = Math.round(ev.homePct);
-    const away = Math.round(ev.awayPct);
-    const draw = Math.max(0, 100 - home - away);
-    return { home, draw, away };
+    if (!ev || ev.homePct == null || ev.awayPct == null) return null;
+    return {
+      home: Math.round(ev.homePct),
+      draw: Math.round(ev.drawPct ?? Math.max(0, 100 - ev.homePct - ev.awayPct)),
+      away: Math.round(ev.awayPct),
+    };
   }
 
   isPickCorrect(pick: any, team: string): boolean {

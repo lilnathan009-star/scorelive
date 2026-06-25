@@ -32,6 +32,42 @@ function mapStatus(name) {
 
 function normName(n) { return ESPN_NAME_MAP[n] ?? n; }
 
+// Convierte moneyline americano (+380, -160) a probabilidad implícita (0-1)
+function mlToProb(odds) {
+  const n = parseFloat(String(odds).replace(/[^0-9\-\+\.]/g, ''));
+  if (isNaN(n)) return 0;
+  return n > 0 ? 100 / (n + 100) : Math.abs(n) / (Math.abs(n) + 100);
+}
+
+// Extrae probabilidades normalizadas (sin vig) a partir de moneyline
+function extractProbs(comp) {
+  // Primero intentar predictor ESPN
+  const pred = comp.predictor;
+  const ph = pred?.homeTeam?.teamChancePct ?? pred?.homeTeam?.gameProjection;
+  const pa = pred?.awayTeam?.teamChancePct ?? pred?.awayTeam?.gameProjection;
+  if (ph != null && pa != null) {
+    const home = parseFloat(ph), away = parseFloat(pa);
+    const draw = Math.max(0, 100 - home - away);
+    return { homePct: home, drawPct: draw, awayPct: away };
+  }
+
+  // Fallback: moneyline de DraftKings
+  const ml = comp.odds?.[0]?.moneyline;
+  if (!ml) return { homePct: null, drawPct: null, awayPct: null };
+
+  const rh = mlToProb(ml.home?.close?.odds ?? ml.home?.open?.odds);
+  const ra = mlToProb(ml.away?.close?.odds ?? ml.away?.open?.odds);
+  const rd = mlToProb(ml.draw?.close?.odds ?? ml.draw?.open?.odds);
+  const total = rh + ra + rd;
+  if (total === 0) return { homePct: null, drawPct: null, awayPct: null };
+
+  return {
+    homePct: Math.round((rh / total) * 100),
+    drawPct: Math.round((rd / total) * 100),
+    awayPct: Math.round((ra / total) * 100),
+  };
+}
+
 function mapEvent(comp, event) {
   const home = comp.competitors.find(c => c.homeAway === 'home');
   const away = comp.competitors.find(c => c.homeAway === 'away');
@@ -58,9 +94,7 @@ function mapEvent(comp, event) {
       red:     d.redCard,
     }));
 
-  const pred = comp.predictor;
-  const homePct = pred?.homeTeam?.teamChancePct ?? pred?.homeTeam?.gameProjection ?? null;
-  const awayPct = pred?.awayTeam?.teamChancePct ?? pred?.awayTeam?.gameProjection ?? null;
+  const { homePct, drawPct, awayPct } = extractProbs(comp);
 
   return {
     espnId:      comp.id,
@@ -74,8 +108,9 @@ function mapEvent(comp, event) {
     awayScore:   away?.score != null ? parseInt(away.score) : null,
     homeLogo:    home?.team?.logo ?? '',
     awayLogo:    away?.team?.logo ?? '',
-    homePct:     homePct != null ? parseFloat(homePct) : null,
-    awayPct:     awayPct != null ? parseFloat(awayPct) : null,
+    homePct,
+    drawPct,
+    awayPct,
     goals,
     cards,
   };
