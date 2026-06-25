@@ -710,6 +710,7 @@
   position: absolute;
   top: -20px;
   border-radius: 2px;
+  will-change: transform;
   animation: cf-fall linear infinite;
 
   &:nth-child(1)  { left: 5%;  width: 8px;  height: 12px; background: #FFE500; animation-duration: 3.0s; animation-delay: 0.0s; }
@@ -772,8 +773,8 @@
 }
 
 @keyframes trophy-bounce {
-  0%, 100% { transform: translateY(0)   scale(1);    filter: drop-shadow(0 0 10px #FFE50070); }
-  50%       { transform: translateY(-9px) scale(1.07); filter: drop-shadow(0 0 26px #FFE500CC); }
+  0%, 100% { transform: translateY(0)    scale(1);    opacity: 0.9; }
+  50%       { transform: translateY(-9px) scale(1.07); opacity: 1;   }
 }
 
 /* ── Muñecos ── */
@@ -1221,10 +1222,9 @@
   background: rgba(0,0,0,0.45);
   border: 1px solid rgba(255,255,255,0.18);
   transition: box-shadow 0.4s ease, border-color 0.4s ease;
-  backdrop-filter: blur(2px);
   cursor: pointer;
 
-  &:hover { border-color: rgba(0,212,176,0.5); box-shadow: 0 0 10px rgba(0,212,176,0.15); }
+  &:hover { border-color: rgba(0,212,176,0.5); }
 
   &::before {
     content: '';
@@ -2219,5 +2219,16 @@
     .tercero-row {
       grid-template-columns: 14px 14px 18px 1fr 22px 24px;
     }
+  }
+
+  /* Desactivar animaciones pesadas en mobile */
+  .confetti-stage { display: none; }
+  .podium-trophy  { animation: none !important; }
+  .gold-col .pc-wrap { animation: none !important; }
+
+  /* Zone seats sin transiciones en mobile para scroll fluido */
+  .zone-seat {
+    transition: none !important;
+    &:hover { border-color: rgba(255,255,255,0.18); }
   }
 }

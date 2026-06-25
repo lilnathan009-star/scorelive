@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SocketService, LeaderboardEntry, LiveMatch } from '../../services/socket';
 import { HttpClient } from '@angular/common/http';
@@ -138,15 +138,22 @@ export class Leaderboard implements OnInit, OnDestroy {
   constructor(
     private socketService: SocketService,
     private http: HttpClient,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private zone: NgZone
   ) {}
 
   ngOnInit() {
     this.cargarLeaderboard();
-    this.pollInterval = setInterval(() => this.cargarLeaderboard(), 5000);
     this.loadStats();
     this.loadWCData();
     this.loadGroupSummary();
+
+    // Correr polls fuera del zone de Angular para no triggear change detection en cada tick
+    this.zone.runOutsideAngular(() => {
+      this.pollInterval = setInterval(() => this.cargarLeaderboard(), 5000);
+      this.matchPollInterval = setInterval(() => this.cargarPartidosVivos(), 30000);
+      this.espnInterval = setInterval(() => this.pollESPNClock(), 15000);
+    });
 
     // Leaderboard via socket
     this.subs.push(
@@ -213,13 +220,9 @@ export class Leaderboard implements OnInit, OnDestroy {
       })
     );
 
-    // Carga inicial + poll cada 30s como respaldo
+    // Carga inicial de partidos y ESPN
     this.cargarPartidosVivos();
-    this.matchPollInterval = setInterval(() => this.cargarPartidosVivos(), 30000);
-
-    // ESPN clock poll cada 15s (sin límite de requests)
     this.pollESPNClock();
-    this.espnInterval = setInterval(() => this.pollESPNClock(), 15000);
   }
 
   startRotation() {
@@ -229,10 +232,12 @@ export class Leaderboard implements OnInit, OnDestroy {
       return;
     }
     // Rotar entre todos los partidos (en vivo o pending)
-    this.rotateInterval = setInterval(() => {
-      this.currentMatchIdx = (this.currentMatchIdx + 1) % this.liveMatches.length;
-      this.cdr.detectChanges();
-    }, 6000);
+    this.zone.runOutsideAngular(() => {
+      this.rotateInterval = setInterval(() => {
+        this.currentMatchIdx = (this.currentMatchIdx + 1) % this.liveMatches.length;
+        this.cdr.detectChanges();
+      }, 6000);
+    });
   }
 
   get currentMatch(): LiveMatch | null {
@@ -853,10 +858,12 @@ export class Leaderboard implements OnInit, OnDestroy {
 
   startGossipRotation() {
     if (this.gossipRotateInterval) return;
-    this.gossipRotateInterval = setInterval(() => {
-      this.rotateGossip();
-      this.cdr.detectChanges();
-    }, 20000);
+    this.zone.runOutsideAngular(() => {
+      this.gossipRotateInterval = setInterval(() => {
+        this.rotateGossip();
+        this.cdr.detectChanges();
+      }, 20000);
+    });
   }
 
   rotateGossip() {
