@@ -74,6 +74,9 @@ export class Leaderboard implements OnInit, OnDestroy {
   wcStandings: any[] = [];
   wcResults: any[] = [];
   espnEvents: any[] = [];
+
+  // Resumen fase de grupos
+  groupSummary: any[] = [];
   selectedGroup = 'Group A';
   wcLoading = false;
 
@@ -98,6 +101,7 @@ export class Leaderboard implements OnInit, OnDestroy {
     this.pollInterval = setInterval(() => this.cargarLeaderboard(), 5000);
     this.loadStats();
     this.loadWCData();
+    this.loadGroupSummary();
 
     // Leaderboard via socket
     this.subs.push(
@@ -221,6 +225,13 @@ export class Leaderboard implements OnInit, OnDestroy {
         this.startRotation();
         this.cdr.detectChanges();
       },
+      error: () => {}
+    });
+  }
+
+  loadGroupSummary() {
+    this.http.get<any[]>('/api/groups/summary').subscribe({
+      next: data => { this.groupSummary = data; this.cdr.detectChanges(); },
       error: () => {}
     });
   }

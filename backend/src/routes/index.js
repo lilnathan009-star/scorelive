@@ -56,6 +56,35 @@ router.post('/final/predictions/import', tournCtrl.importFinalPredictions);
 // --- Leaderboard ---
 router.get('/leaderboard', leaderCtrl.getLeaderboard);
 
+// --- Resumen fase de grupos (puntos + picks de mejor tercero) ---
+router.get('/groups/summary', async (req, res) => {
+  const pool = require('../config/db');
+  try {
+    const { rows } = await pool.query(`
+      SELECT
+        u.id as user_id,
+        u.user_name,
+        u.initials,
+        COALESCE(SUM(gp.points), 0)::int as group_points,
+        json_agg(
+          json_build_object('group', gp.group_name, 'team', gp.third_team)
+          ORDER BY gp.group_name
+        ) FILTER (WHERE gp.third_team IS NOT NULL) as thirds
+      FROM users u
+      JOIN group_predictions gp ON gp.user_id = u.id AND gp.tournament_id = 1
+      GROUP BY u.id, u.user_name, u.initials
+      ORDER BY group_points DESC, u.user_name ASC
+    `);
+    res.json(rows.map(r => ({
+      ...r,
+      group_points: parseInt(r.group_points) || 0,
+      thirds: r.thirds || []
+    })));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // --- Usuarios ---
 router.get('/users', async (req, res) => {
   const pool = require('../config/db');

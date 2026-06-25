@@ -256,6 +256,39 @@
       @if (bestThirds.length > 0) {
         <div class="terceros-note">Top 8 clasifican · {{ bestThirds.length }}/12 grupos</div>
       }
+
+      <!-- PUNTOS FASE GRUPOS -->
+      @if (groupSummary.length > 0) {
+        <div class="gp-section">
+          <div class="gp-title">⚽ PUNTOS GRUPOS</div>
+          @for (u of groupSummary; track u.user_id; let i = $index) {
+            <div class="gp-row">
+              <span class="gp-rank">{{ i + 1 }}</span>
+              <span class="gp-name">{{ u.user_name.split(' ')[0] }}</span>
+              <span class="gp-pts" [class.gp-zero]="u.group_points === 0">{{ u.group_points }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="tp-section">
+          <div class="tp-title">🔮 PICKS · MEJOR 3°</div>
+          @for (u of groupSummary; track u.user_id) {
+            @if (u.thirds?.length > 0) {
+              <div class="tp-user-row">
+                <span class="tp-name">{{ u.user_name.split(' ')[0] }}</span>
+                <div class="tp-chips">
+                  @for (t of u.thirds; track t.group) {
+                    <span class="tp-chip" [title]="t.group + ': ' + t.team">
+                      <span class="tp-grp">{{ t.group }}</span>
+                      <img class="tp-flag" [src]="getFlagUrl(t.team)" [alt]="t.team" onerror="this.style.display='none'" />
+                    </span>
+                  }
+                </div>
+              </div>
+            }
+          }
+        </div>
+      }
     </div>
 
     <!-- ══ COLUMNA PRINCIPAL ══ -->
