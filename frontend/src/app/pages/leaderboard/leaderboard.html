@@ -22,7 +22,7 @@
             @if (getFlagUrl(currentMatch.home_team)) {
               <img class="team-flag-img" [src]="getFlagUrl(currentMatch.home_team)" [alt]="currentMatch.home_team" />
             }
-            <span class="team-name">{{ currentMatch.home_team }}</span>
+            <span class="team-name">{{ teamEs(currentMatch.home_team) }}</span>
           </div>
         </div>
 
@@ -54,7 +54,7 @@
             @if (getFlagUrl(currentMatch.away_team)) {
               <img class="team-flag-img" [src]="getFlagUrl(currentMatch.away_team)" [alt]="currentMatch.away_team" />
             }
-            <span class="team-name">{{ currentMatch.away_team }}</span>
+            <span class="team-name">{{ teamEs(currentMatch.away_team) }}</span>
           </div>
           <div class="goals-side away-goals">
             @for (g of getMatchGoals(currentMatch, 'away'); track g.minute) {
@@ -124,7 +124,7 @@
               <span class="st-team">
                 <img class="mini-flag" [src]="getFlagFromCrest(row.crest, row.team)" [alt]="row.tla" onerror="this.style.display='none'" />
                 <span class="st-tla">{{ row.tla }}</span>
-                <span class="st-name">{{ row.team }}</span>
+                <span class="st-name">{{ teamEs(row.team) }}</span>
               </span>
               <span class="st-stat">{{ row.played }}</span>
               <span class="st-stat">{{ row.won }}</span>
@@ -156,9 +156,9 @@
             <div class="espn-header">
               <div class="espn-teams">
                 <img class="mini-flag" [src]="ev.homeLogo" [alt]="ev.home" onerror="this.style.display='none'" />
-                <span>{{ ev.home }}</span>
+                <span>{{ teamEs(ev.home) }}</span>
                 <span class="espn-score">{{ ev.homeScore }} – {{ ev.awayScore }}</span>
-                <span>{{ ev.away }}</span>
+                <span>{{ teamEs(ev.away) }}</span>
                 <img class="mini-flag" [src]="ev.awayLogo" [alt]="ev.away" onerror="this.style.display='none'" />
               </div>
               @if (ev.status === 'live') {
@@ -177,7 +177,7 @@
                     <span class="ev-icon">{{ g.ownGoal ? '⚽🔴' : g.penalty ? '⚽(P)' : '⚽' }}</span>
                     <span class="ev-min">{{ g.minute }}'</span>
                     <span class="ev-player">{{ g.scorer }}</span>
-                    <span class="ev-side">{{ g.team === 'home' ? ev.home : ev.away }}</span>
+                    <span class="ev-side">{{ g.team === 'home' ? teamEs(ev.home) : teamEs(ev.away) }}</span>
                   </div>
                 }
               </div>
@@ -190,7 +190,7 @@
                     <span class="ev-icon">{{ c.red ? '🟥' : '🟨' }}</span>
                     <span class="ev-min">{{ c.minute }}'</span>
                     <span class="ev-player">{{ c.player }}</span>
-                    <span class="ev-side">{{ c.team === 'home' ? ev.home : ev.away }}</span>
+                    <span class="ev-side">{{ c.team === 'home' ? teamEs(ev.home) : teamEs(ev.away) }}</span>
                   </div>
                 }
               </div>
@@ -212,11 +212,11 @@
               <div class="res-match">
                 <div class="res-team home">
                   <img class="mini-flag" [src]="getFlagFromCrest(r.homeCrest, r.home)" [alt]="r.home" onerror="this.style.display='none'" />
-                  <span>{{ r.home }}</span>
+                  <span>{{ teamEs(r.home) }}</span>
                 </div>
                 <div class="res-score">{{ r.homeScore }} – {{ r.awayScore }}</div>
                 <div class="res-team away">
-                  <span>{{ r.away }}</span>
+                  <span>{{ teamEs(r.away) }}</span>
                   <img class="mini-flag" [src]="getFlagFromCrest(r.awayCrest, r.away)" [alt]="r.away" onerror="this.style.display='none'" />
                 </div>
               </div>
@@ -454,7 +454,7 @@
             @if (getFlagUrl(match.home_team)) {
               <img [src]="getFlagUrl(match.home_team)" [alt]="match.home_team" />
             }
-            <span>{{ match.home_team }}</span>
+            <span>{{ teamEs(match.home_team) }}</span>
           </div>
           <div class="sb-score-center">
             @if (match.home_score !== null && match.away_score !== null) {
@@ -478,7 +478,7 @@
             @if (getFlagUrl(match.away_team)) {
               <img [src]="getFlagUrl(match.away_team)" [alt]="match.away_team" />
             }
-            <span>{{ match.away_team }}</span>
+            <span>{{ teamEs(match.away_team) }}</span>
           </div>
         </div>
       </div>
@@ -588,17 +588,17 @@
                 <div class="gpick-teams">
                   <div class="gpick-team" [class.gpick-ok]="isPickCorrect(pick, pick.team1)" [class.gpick-miss]="pick.result_team1 && !isPickCorrect(pick, pick.team1)">
                     <img class="gpick-flag" [src]="getFlagUrl(pick.team1)" [alt]="pick.team1" onerror="this.style.display='none'" />
-                    <span>{{ pick.team1 }}</span>
+                    <span>{{ teamEs(pick.team1) }}</span>
                   </div>
                   <div class="gpick-team" [class.gpick-ok]="isPickCorrect(pick, pick.team2)" [class.gpick-miss]="pick.result_team1 && !isPickCorrect(pick, pick.team2)">
                     <img class="gpick-flag" [src]="getFlagUrl(pick.team2)" [alt]="pick.team2" onerror="this.style.display='none'" />
-                    <span>{{ pick.team2 }}</span>
+                    <span>{{ teamEs(pick.team2) }}</span>
                   </div>
                   @if (pick.third_team) {
                     <div class="gpick-third">
                       <span class="gpick-third-lbl">3°</span>
                       <img class="gpick-flag" [src]="getFlagUrl(pick.third_team)" [alt]="pick.third_team" onerror="this.style.display='none'" />
-                      <span>{{ pick.third_team }}</span>
+                      <span>{{ teamEs(pick.third_team) }}</span>
                     </div>
                   }
                 </div>

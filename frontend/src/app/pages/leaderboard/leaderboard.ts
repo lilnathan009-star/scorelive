@@ -48,9 +48,54 @@ const TEAM_ISO: Record<string, string> = {
   'Kosovo': 'xk', 'North Macedonia': 'mk', 'Montenegro': 'me',
 };
 
+const TEAM_ES: Record<string, string> = {
+  // América del Norte y Central
+  'Mexico': 'México', 'United States': 'EE.UU.', 'Canada': 'Canadá',
+  'Costa Rica': 'Costa Rica', 'Honduras': 'Honduras', 'Panama': 'Panamá',
+  'El Salvador': 'El Salvador', 'Jamaica': 'Jamaica', 'Haiti': 'Haití',
+  'Trinidad and Tobago': 'Trinidad y Tobago', 'Curaçao': 'Curaçao',
+  // América del Sur
+  'Brazil': 'Brasil', 'Argentina': 'Argentina', 'Colombia': 'Colombia',
+  'Uruguay': 'Uruguay', 'Chile': 'Chile', 'Ecuador': 'Ecuador',
+  'Peru': 'Perú', 'Venezuela': 'Venezuela', 'Paraguay': 'Paraguay',
+  'Bolivia': 'Bolivia', 'Cape Verde': 'Cabo Verde',
+  // Europa
+  'Germany': 'Alemania', 'France': 'Francia', 'Spain': 'España',
+  'Portugal': 'Portugal', 'Netherlands': 'Países Bajos', 'England': 'Inglaterra',
+  'Italy': 'Italia', 'Belgium': 'Bélgica', 'Croatia': 'Croacia',
+  'Switzerland': 'Suiza', 'Poland': 'Polonia', 'Denmark': 'Dinamarca',
+  'Austria': 'Austria', 'Sweden': 'Suecia', 'Norway': 'Noruega',
+  'Ukraine': 'Ucrania', 'Serbia': 'Serbia', 'Turkey': 'Turquía',
+  'Czech Republic': 'Rep. Checa', 'Czechia': 'Rep. Checa',
+  'Hungary': 'Hungría', 'Slovakia': 'Eslovaquia', 'Scotland': 'Escocia',
+  'Wales': 'Gales', 'Romania': 'Rumanía', 'Albania': 'Albania',
+  'Georgia': 'Georgia', 'Slovenia': 'Eslovenia',
+  'Bosnia-Herzegovina': 'Bosnia-Herzegovina', 'Bosnia and Herzegovina': 'Bosnia-Herzegovina',
+  'North Macedonia': 'Macedonia del Norte', 'Montenegro': 'Montenegro',
+  'Kosovo': 'Kosovo', 'Finland': 'Finlandia', 'Greece': 'Grecia',
+  'Iceland': 'Islandia', 'Israel': 'Israel',
+  // África
+  'Morocco': 'Marruecos', 'Senegal': 'Senegal', 'Nigeria': 'Nigeria',
+  'Cameroon': 'Camerún', 'Ghana': 'Ghana', 'Egypt': 'Egipto',
+  'South Africa': 'Sudáfrica', 'Ivory Coast': 'Costa de Marfil',
+  'Algeria': 'Argelia', 'Tunisia': 'Túnez', 'Mali': 'Mali',
+  'DR Congo': 'R.D. Congo', 'Congo DR': 'R.D. Congo',
+  'Democratic Republic of Congo': 'R.D. Congo',
+  // Asia y Oceanía
+  'South Korea': 'Corea del Sur', 'Korea Republic': 'Corea del Sur',
+  'Japan': 'Japón', 'Australia': 'Australia', 'Saudi Arabia': 'Arabia Saudí',
+  'Iran': 'Irán', 'Qatar': 'Catar', 'China': 'China',
+  'Indonesia': 'Indonesia', 'Iraq': 'Irak', 'Jordan': 'Jordania',
+  'Uzbekistan': 'Uzbekistán', 'New Zealand': 'Nueva Zelanda',
+};
+
 function getFlagUrl(team: string): string {
   const iso = TEAM_ISO[team];
   return iso ? `https://flagcdn.com/w80/${iso}.png` : '';
+}
+
+function teamEs(name: string): string {
+  return TEAM_ES[name] ?? name;
 }
 
 @Component({
@@ -195,6 +240,7 @@ export class Leaderboard implements OnInit, OnDestroy {
   }
 
   getFlagUrl(team: string): string { return getFlagUrl(team); }
+  teamEs(name: string): string { return teamEs(name); }
 
   isLive(match: LiveMatch): boolean { return match.status === 'live'; }
   isPending(match: LiveMatch): boolean { return match.status === 'pending'; }
@@ -888,7 +934,7 @@ export class Leaderboard implements OnInit, OnDestroy {
   openPredModal(match: LiveMatch | null) {
     if (!match) return;
     this.predModalMatch = match;
-    this.predModalTitle = `${match.home_team} vs ${match.away_team}`;
+    this.predModalTitle = `${teamEs(match.home_team)} vs ${teamEs(match.away_team)}`;
     this.predModalPreds = [];
     this.predModalLoading = true;
     this.showPredModal = true;
