@@ -129,4 +129,34 @@ async function fetchWCScoreboardDate(date) {
   return (data.events || []).map(ev => mapEvent(ev.competitions[0], ev));
 }
 
-module.exports = { fetchWCScoreboard, fetchWCScoreboardDate };
+// Tabla de posiciones en tiempo real desde ESPN
+async function fetchESPNStandings() {
+  const res = await fetch('https://site.api.espn.com/apis/v2/sports/soccer/fifa.world/standings');
+  if (!res.ok) throw new Error(`ESPN standings ${res.status}`);
+  const data = await res.json();
+
+  return (data.children || []).map(group => {
+    const entries = group.standings?.entries || [];
+    const table = entries.map(entry => {
+      const stat = name => entry.stats?.find(s => s.name === name)?.value ?? 0;
+      return {
+        position: stat('rank'),
+        team:     entry.team.shortDisplayName || entry.team.displayName,
+        tla:      entry.team.abbreviation,
+        crest:    entry.team.logos?.[0]?.href ?? '',
+        played:   stat('gamesPlayed'),
+        won:      stat('wins'),
+        draw:     stat('ties'),
+        lost:     stat('losses'),
+        gf:       stat('pointsFor'),
+        ga:       stat('pointsAgainst'),
+        gd:       stat('pointDifferential'),
+        points:   stat('points'),
+      };
+    }).sort((a, b) => a.position - b.position);
+
+    return { group: group.name, table };
+  });
+}
+
+module.exports = { fetchWCScoreboard, fetchWCScoreboardDate, fetchESPNStandings };

@@ -122,11 +122,12 @@ router.get('/users', async (req, res) => {
   }
 });
 
-// --- football-data.org: solo standings y resultados para sección Mundial ---
-const { fetchStandings, fetchRecentResults } = require('../services/footballDataService');
+// --- standings en tiempo real desde ESPN ---
+const { fetchESPNStandings } = require('../services/espnService');
+const { fetchRecentResults } = require('../services/footballDataService');
 
 router.get('/football/standings', async (req, res) => {
-  try { res.json(await fetchStandings()); }
+  try { res.json(await fetchESPNStandings()); }
   catch (err) { res.status(500).json({ error: err.message }); }
 });
 
