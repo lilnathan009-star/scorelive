@@ -270,24 +270,6 @@
           }
         </div>
 
-        <div class="tp-section">
-          <div class="tp-title">🔮 PICKS · MEJOR 3°</div>
-          @for (u of groupSummary; track u.user_id) {
-            @if (u.thirds?.length > 0) {
-              <div class="tp-user-row">
-                <span class="tp-name">{{ u.user_name.split(' ')[0] }}</span>
-                <div class="tp-chips">
-                  @for (t of u.thirds; track t.group) {
-                    <span class="tp-chip" [title]="t.group + ': ' + t.team">
-                      <span class="tp-grp">{{ t.group }}</span>
-                      <img class="tp-flag" [src]="getFlagUrl(t.team)" [alt]="t.team" onerror="this.style.display='none'" />
-                    </span>
-                  }
-                </div>
-              </div>
-            }
-          }
-        </div>
       }
     </div>
 
@@ -365,7 +347,8 @@
                 <div class="zone-seat"
                      [class.glow-up]="fw.entry.trend === 'up'"
                      [class.glow-down]="fw.entry.trend === 'down'"
-                     [class.cf-advance]="fw.cf">
+                     [class.cf-advance]="fw.cf"
+                     (click)="openGroupPicksModal(fw.entry)">
                   <div class="zs-role">{{ fw.role }}</div>
                   <div class="zs-pos">{{ fw.entry.position }}</div>
                   @if (fw.entry.trend === 'up')   { <div class="zs-trend up">↑</div> }
@@ -382,7 +365,7 @@
             <div class="form-role-lbl">MEDIOCAMPO</div>
             <div class="form-row form-row-mid">
               @for (e of entries.slice(3, 6); track e.user_id; let i = $index) {
-                <div class="zone-seat" [class.glow-up]="e.trend === 'up'" [class.glow-down]="e.trend === 'down'" [class.cm-drop]="i === 1">
+                <div class="zone-seat" [class.glow-up]="e.trend === 'up'" [class.glow-down]="e.trend === 'down'" [class.cm-drop]="i === 1" (click)="openGroupPicksModal(e)">
                   <div class="zs-role">{{ getRole('mid', i) }}</div>
                   <div class="zs-pos">{{ e.position }}</div>
                   @if (e.trend === 'up')   { <div class="zs-trend up">↑</div> }
@@ -399,7 +382,7 @@
             <div class="form-role-lbl">DEFENSAS</div>
             <div class="form-row">
               @for (e of entries.slice(6, 10); track e.user_id; let i = $index) {
-                <div class="zone-seat" [class.glow-up]="e.trend === 'up'" [class.glow-down]="e.trend === 'down'" [class.lb-advance]="i === 0 || i === 3" [class.cb-drop]="i === 1 || i === 2">
+                <div class="zone-seat" [class.glow-up]="e.trend === 'up'" [class.glow-down]="e.trend === 'down'" [class.lb-advance]="i === 0 || i === 3" [class.cb-drop]="i === 1 || i === 2" (click)="openGroupPicksModal(e)">
                   <div class="zs-role">{{ getRole('def', i) }}</div>
                   <div class="zs-pos">{{ e.position }}</div>
                   @if (e.trend === 'up')   { <div class="zs-trend up">↑</div> }
@@ -416,7 +399,7 @@
             <div class="form-role-lbl">PORTERO</div>
             <div class="form-row">
               @for (e of entries.slice(10, 11); track e.user_id; let i = $index) {
-                <div class="zone-seat" [class.glow-up]="e.trend === 'up'" [class.glow-down]="e.trend === 'down'">
+                <div class="zone-seat" [class.glow-up]="e.trend === 'up'" [class.glow-down]="e.trend === 'down'" (click)="openGroupPicksModal(e)">
                   <div class="zs-role">{{ getRole('gk', i) }}</div>
                   <div class="zs-pos">{{ e.position }}</div>
                   @if (e.trend === 'up')   { <div class="zs-trend up">↑</div> }
@@ -438,7 +421,7 @@
         <div class="suplentes-title">SUPLENTES</div>
         <div class="suplentes-bench">
           @for (e of entries.slice(11); track e.user_id) {
-            <div class="zone-seat" [class.glow-up]="e.trend === 'up'" [class.glow-down]="e.trend === 'down'">
+            <div class="zone-seat" [class.glow-up]="e.trend === 'up'" [class.glow-down]="e.trend === 'down'" (click)="openGroupPicksModal(e)">
               <div class="zs-pos">{{ e.position }}</div>
               @if (e.trend === 'up')   { <div class="zs-trend up">↑</div> }
               @if (e.trend === 'down') { <div class="zs-trend dn">↓</div> }
@@ -581,6 +564,58 @@
 
   </div>
   } <!-- end leaderboard view -->
+
+  <!-- MODAL PICKS DE GRUPOS -->
+  @if (showGroupPicksModal) {
+    <div class="pred-overlay" (click)="closeGroupPicksModal()">
+      <div class="gpicks-modal" (click)="$event.stopPropagation()">
+        <div class="pred-modal-header">
+          <div class="pred-modal-titles">
+            <span class="pred-modal-label">Fase de Grupos</span>
+            <span class="pred-modal-match">{{ groupPicksUser }}</span>
+          </div>
+          <button class="pred-close" (click)="closeGroupPicksModal()">✕</button>
+        </div>
+        @if (groupPicksLoading) {
+          <div class="pred-state">Cargando...</div>
+        } @else if (groupPicksList.length === 0) {
+          <div class="pred-state">Sin picks de fase de grupos</div>
+        } @else {
+          <div class="gpicks-grid">
+            @for (pick of groupPicksList; track pick.group_name) {
+              <div class="gpick-card" [class.gpick-finished]="pick.result_team1">
+                <div class="gpick-lbl">Grupo {{ pick.group_name }}</div>
+                <div class="gpick-teams">
+                  <div class="gpick-team" [class.gpick-ok]="isPickCorrect(pick, pick.team1)" [class.gpick-miss]="pick.result_team1 && !isPickCorrect(pick, pick.team1)">
+                    <img class="gpick-flag" [src]="getFlagUrl(pick.team1)" [alt]="pick.team1" onerror="this.style.display='none'" />
+                    <span>{{ pick.team1 }}</span>
+                  </div>
+                  <div class="gpick-team" [class.gpick-ok]="isPickCorrect(pick, pick.team2)" [class.gpick-miss]="pick.result_team1 && !isPickCorrect(pick, pick.team2)">
+                    <img class="gpick-flag" [src]="getFlagUrl(pick.team2)" [alt]="pick.team2" onerror="this.style.display='none'" />
+                    <span>{{ pick.team2 }}</span>
+                  </div>
+                  @if (pick.third_team) {
+                    <div class="gpick-third">
+                      <span class="gpick-third-lbl">3°</span>
+                      <img class="gpick-flag" [src]="getFlagUrl(pick.third_team)" [alt]="pick.third_team" onerror="this.style.display='none'" />
+                      <span>{{ pick.third_team }}</span>
+                    </div>
+                  }
+                </div>
+                @if (pick.result_team1) {
+                  <div class="gpick-pts" [class.gpick-pts-pos]="pick.points > 0">
+                    {{ pick.points > 0 ? '+' + pick.points + ' pts' : '0 pts' }}
+                  </div>
+                } @else {
+                  <div class="gpick-pts gpick-pending">pendiente</div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
 
   <!-- MODAL PRONÓSTICOS -->
   @if (showPredModal) {

@@ -851,6 +851,33 @@ export class Leaderboard implements OnInit, OnDestroy {
     ].filter(x => x.entry);
   }
 
+  // Modal picks de grupos
+  showGroupPicksModal = false;
+  groupPicksUser = '';
+  groupPicksList: any[] = [];
+  groupPicksLoading = false;
+
+  openGroupPicksModal(entry: LeaderboardEntry) {
+    this.groupPicksUser = entry.user_name;
+    this.groupPicksList = [];
+    this.groupPicksLoading = true;
+    this.showGroupPicksModal = true;
+    this.http.get<any[]>(`/api/groups/picks/${encodeURIComponent(entry.user_name)}`).subscribe({
+      next: data => { this.groupPicksList = data; this.groupPicksLoading = false; this.cdr.detectChanges(); },
+      error: () => { this.groupPicksLoading = false; this.cdr.detectChanges(); }
+    });
+  }
+
+  closeGroupPicksModal() {
+    this.showGroupPicksModal = false;
+    this.groupPicksUser = '';
+  }
+
+  isPickCorrect(pick: any, team: string): boolean {
+    if (!pick.result_team1) return false;
+    return pick.result_team1 === team || pick.result_team2 === team;
+  }
+
   // Modal pronósticos
   showPredModal = false;
   predModalTitle = '';

@@ -1222,6 +1222,9 @@
   border: 1px solid rgba(255,255,255,0.18);
   transition: box-shadow 0.4s ease, border-color 0.4s ease;
   backdrop-filter: blur(2px);
+  cursor: pointer;
+
+  &:hover { border-color: rgba(0,212,176,0.5); box-shadow: 0 0 10px rgba(0,212,176,0.15); }
 
   &::before {
     content: '';
@@ -1877,6 +1880,115 @@
     object-fit: cover;
     border-radius: 1px;
   }
+}
+
+/* ── Modal picks de grupos ── */
+.gpicks-modal {
+  background: #0f1624;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 18px;
+  padding: 0;
+  width: 90vw;
+  max-width: 640px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.gpicks-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 12px;
+}
+
+.gpick-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 8px 8px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &.gpick-finished {
+    border-color: rgba(255,255,255,0.14);
+  }
+}
+
+.gpick-lbl {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #D4A000;
+  text-align: center;
+}
+
+.gpick-teams {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.gpick-team {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.7);
+  border-radius: 4px;
+  padding: 2px 3px;
+
+  &.gpick-ok {
+    color: #4ade80;
+    background: rgba(74,222,128,0.08);
+  }
+
+  &.gpick-miss {
+    color: rgba(255,255,255,0.3);
+    text-decoration: line-through;
+  }
+}
+
+.gpick-third {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+  color: rgba(255,255,255,0.45);
+  padding: 1px 3px;
+  border-top: 1px dashed rgba(255,255,255,0.08);
+  margin-top: 1px;
+
+  .gpick-third-lbl {
+    font-size: 8px;
+    font-weight: 700;
+    color: #FFE500;
+    opacity: 0.7;
+  }
+}
+
+.gpick-flag {
+  width: 18px;
+  height: 13px;
+  object-fit: cover;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.gpick-pts {
+  font-size: 9px;
+  font-weight: 700;
+  text-align: right;
+  color: rgba(255,255,255,0.25);
+  margin-top: 2px;
+
+  &.gpick-pts-pos { color: #4ade80; }
+  &.gpick-pending { color: rgba(255,255,255,0.15); font-weight: 400; }
+}
+
+@media (max-width: 480px) {
+  .gpicks-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* ── TOP 3 card ── */

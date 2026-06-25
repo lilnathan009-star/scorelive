@@ -85,6 +85,32 @@ router.get('/groups/summary', async (req, res) => {
   }
 });
 
+// --- Picks de grupos por usuario ---
+router.get('/groups/picks/:user_name', async (req, res) => {
+  const pool = require('../config/db');
+  try {
+    const { rows } = await pool.query(`
+      SELECT
+        gp.group_name,
+        gp.team1,
+        gp.team2,
+        gp.third_team,
+        COALESCE(gp.points, 0) as points,
+        gr.team1 as result_team1,
+        gr.team2 as result_team2
+      FROM group_predictions gp
+      JOIN users u ON u.id = gp.user_id
+      LEFT JOIN group_results gr
+        ON gr.tournament_id = gp.tournament_id AND gr.group_name = gp.group_name
+      WHERE u.user_name = $1 AND gp.tournament_id = 1
+      ORDER BY gp.group_name ASC
+    `, [req.params.user_name]);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // --- Usuarios ---
 router.get('/users', async (req, res) => {
   const pool = require('../config/db');
