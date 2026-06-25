@@ -22,7 +22,7 @@ async function createTournament(req, res) {
 // Listar torneos
 async function getTournaments(req, res) {
   try {
-    const result = await pool.query('SELECT * FROM tournaments ORDER BY created_at DESC');
+    const result = await pool.query('SELECT * FROM tournaments ORDER BY id ASC');
     res.json(result.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
