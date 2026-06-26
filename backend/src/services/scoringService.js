@@ -131,7 +131,7 @@ async function recalculateFinal(tournamentId, io) {
 
 async function broadcastLeaderboard(io) {
   const res = await pool.query('SELECT * FROM leaderboard');
-  io.emit('leaderboard_update', res.rows);
+  if (io) io.emit('leaderboard_update', res.rows);
 }
 
 module.exports = {
