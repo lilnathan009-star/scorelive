@@ -1,19 +1,36 @@
 const pool = require('../config/db');
-const { fetchESPNStandings } = require('./espnService');
+const { fetchESPNStandings, fetchWCScoreboard } = require('./espnService');
 const { recalculateGroups } = require('./scoringService');
 
 // Nombres ESPN → nombres usados en predicciones
 const ESPN_NAME_MAP = {
-  'Bosnia-Herz':  'Bosnia-Herzegovina',
-  'USA':          'United States',
-  'Türkiye':      'Turkey',
-  'IR Iran':      'Iran',
+  'Bosnia-Herz':    'Bosnia-Herzegovina',
+  'USA':            'United States',
+  'Türkiye':        'Turkey',
+  'IR Iran':        'Iran',
   'Korea Republic': 'South Korea',
 };
 const norm = name => ESPN_NAME_MAP[name] ?? name;
 
 async function autoGroupResults(io) {
   try {
+    // Verificar si hay partidos EN VIVO o PENDIENTES hoy
+    const todayMatches = await fetchWCScoreboard();
+    const hasActiveMatches = todayMatches.some(m => m.status === 'live' || m.status === 'pending');
+
+    if (hasActiveMatches) {
+      console.log('[AutoGroup] Hay partidos activos hoy, esperando que terminen...');
+      return;
+    }
+
+    // Verificar si hubo partidos hoy (solo procesar si hubo jornada)
+    const hadMatchesToday = todayMatches.length > 0;
+    if (!hadMatchesToday) {
+      console.log('[AutoGroup] No hubo partidos hoy, nada que procesar.');
+      return;
+    }
+
+    // Todos los partidos del dia terminaron — procesar standings
     const standings = await fetchESPNStandings();
 
     const { rows: [tournament] } = await pool.query(
@@ -30,15 +47,21 @@ async function autoGroupResults(io) {
       const groupLetter = group.group.replace('Group ', '');
       const table = group.table;
 
-      // Grupo completo = todos jugaron 3 partidos
+      // Grupo completo = todos los equipos jugaron 3 partidos
       const isComplete = table.length === 4 && table.every(t => t.played >= 3);
       if (!isComplete) { allGroupsDone = false; continue; }
 
       const team1 = norm(table[0].team);
       const team2 = norm(table[1].team);
-      thirds.push({ team: norm(table[2].team), group: groupLetter, points: table[2].points, gd: table[2].gd, gf: table[2].gf });
+      thirds.push({
+        team:   norm(table[2].team),
+        group:  groupLetter,
+        points: table[2].points,
+        gd:     table[2].gd,
+        gf:     table[2].gf,
+      });
 
-      // Upsert resultado del grupo (solo team1 y team2, sin tocar third_team aún)
+      // Upsert team1 y team2 (sin tocar third_team aun)
       const { rows: existing } = await pool.query(
         'SELECT team1, team2 FROM group_results WHERE tournament_id = $1 AND group_name = $2',
         [tid, groupLetter]
@@ -50,7 +73,7 @@ async function autoGroupResults(io) {
            VALUES ($1, $2, $3, $4)`,
           [tid, groupLetter, team1, team2]
         );
-        console.log(`[AutoGroup] Inserted ${groupLetter}: ${team1}, ${team2}`);
+        console.log(`[AutoGroup] Insertado ${groupLetter}: ${team1}, ${team2}`);
         anyUpdated = true;
       } else if (existing[0].team1 !== team1 || existing[0].team2 !== team2) {
         await pool.query(
@@ -58,13 +81,14 @@ async function autoGroupResults(io) {
            WHERE tournament_id = $3 AND group_name = $4`,
           [team1, team2, tid, groupLetter]
         );
-        console.log(`[AutoGroup] Updated ${groupLetter}: ${team1}, ${team2}`);
+        console.log(`[AutoGroup] Actualizado ${groupLetter}: ${team1}, ${team2}`);
         anyUpdated = true;
       }
     }
 
-    // Terceros: solo cuando los 12 grupos terminaron
+    // Mejores terceros: SOLO cuando los 12 grupos estan todos completos
     if (allGroupsDone && thirds.length === 12) {
+      console.log('[AutoGroup] Fase de grupos completa — calculando mejores 8 terceros...');
       const sorted = [...thirds].sort((a, b) =>
         b.points - a.points || b.gd - a.gd || b.gf - a.gf
       );
@@ -89,7 +113,7 @@ async function autoGroupResults(io) {
 
     if (anyUpdated) {
       await recalculateGroups(tid, io);
-      console.log('[AutoGroup] Puntos recalculados.');
+      console.log('[AutoGroup] Puntos recalculados y leaderboard actualizado.');
     }
   } catch (err) {
     console.error('[AutoGroup] Error:', err.message);
@@ -97,10 +121,9 @@ async function autoGroupResults(io) {
 }
 
 function startAutoGroupResults(io) {
-  autoGroupResults(io);
-  // Revisar cada 10 minutos
+  // No correr al arrancar — esperar el primer ciclo del intervalo
   setInterval(() => autoGroupResults(io), 10 * 60 * 1000);
-  console.log('[AutoGroup] Revisando resultados de grupos cada 10 minutos.');
+  console.log('[AutoGroup] Revisando fin de jornada cada 10 minutos.');
 }
 
 module.exports = { startAutoGroupResults };
