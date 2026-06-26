@@ -171,6 +171,10 @@ export class Leaderboard implements OnInit, OnDestroy {
             .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))
             .slice(0, 5);
           if (this.recentChanges.length > 0) this.loadGossip();
+          this.http.get<any[]>('/api/groups/summary').subscribe({
+            next: gs => { this.groupSummary = gs; },
+            error: () => {}
+          });
           this.cdr.detectChanges();
         }
       })
