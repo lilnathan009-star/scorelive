@@ -1142,6 +1142,14 @@ export class Leaderboard implements OnInit, OnDestroy {
     return pick.result_team1 === team || pick.result_team2 === team;
   }
 
+  isThirdCorrect(pick: any): boolean {
+    return !!(pick.result_third_team && pick.third_team === pick.result_third_team);
+  }
+
+  isThirdWrong(pick: any): boolean {
+    return !!(pick.result_team1 && !this.isThirdCorrect(pick));
+  }
+
   // Modal pronósticos
   showPredModal = false;
   predModalTitle = '';

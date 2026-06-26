@@ -97,7 +97,8 @@ router.get('/groups/picks/:user_name', async (req, res) => {
         gp.third_team,
         COALESCE(gp.points, 0) as points,
         gr.team1 as result_team1,
-        gr.team2 as result_team2
+        gr.team2 as result_team2,
+        gr.third_team as result_third_team
       FROM group_predictions gp
       JOIN users u ON u.id = gp.user_id
       LEFT JOIN group_results gr

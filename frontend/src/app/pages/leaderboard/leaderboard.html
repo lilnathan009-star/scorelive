@@ -595,7 +595,7 @@
                     <span>{{ teamEs(pick.team2) }}</span>
                   </div>
                   @if (pick.third_team) {
-                    <div class="gpick-third">
+                    <div class="gpick-third" [class.gpick-ok]="isThirdCorrect(pick)" [class.gpick-miss]="isThirdWrong(pick)">
                       <span class="gpick-third-lbl">3°</span>
                       <img class="gpick-flag" [src]="getFlagUrl(pick.third_team)" [alt]="pick.third_team" onerror="this.style.display='none'" />
                       <span>{{ teamEs(pick.third_team) }}</span>
