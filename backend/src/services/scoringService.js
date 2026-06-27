@@ -65,9 +65,14 @@ async function recalculateGroups(tournamentId, io) {
         if (realTeams.includes(team)) pts += 3;
       }
 
-      // 3 pts extra por mejor tercero acertado
-      if (pred.third_team && result.third_team && pred.third_team === result.third_team) {
-        pts += 3;
+      // mejor tercero: +3 si el equipo clasificó de cualquier forma (1°, 2° o como mejor tercero)
+      if (pred.third_team) {
+        const allQualified = [result.team1, result.team2];
+        if (result.third_team) allQualified.push(result.third_team);
+        if (allQualified.includes(pred.third_team)) pts += 3;
+
+        // +3 adicional si acertaste exactamente el mejor tercero
+        if (result.third_team && pred.third_team === result.third_team) pts += 3;
       }
 
       await pool.query(
