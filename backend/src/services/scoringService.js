@@ -57,20 +57,13 @@ async function recalculateGroups(tournamentId, io) {
 
     for (const pred of predsRes.rows) {
       let pts = 0;
-      const realTeams = [result.team1, result.team2];
-      const predTeams = [pred.team1, pred.team2];
 
-      // 3 pts por cada equipo clasificado acertado
-      for (const team of predTeams) {
-        if (realTeams.includes(team)) pts += 3;
-      }
+      // El orden no importa: +3 por cada pick que clasificó de cualquier forma (1°, 2° o mejor tercero)
+      const allQualified = [result.team1, result.team2];
+      if (result.third_team) allQualified.push(result.third_team);
 
-      // mejor tercero: +3 si el equipo clasificó de cualquier forma (1°, 2° o como mejor tercero)
-      // máximo +3 en total por esta casilla — el orden no importa pero no acumula bonus
-      if (pred.third_team) {
-        const allQualified = [result.team1, result.team2];
-        if (result.third_team) allQualified.push(result.third_team);
-        if (allQualified.includes(pred.third_team)) pts += 3;
+      for (const team of [pred.team1, pred.team2, pred.third_team].filter(Boolean)) {
+        if (allQualified.includes(team)) pts += 3;
       }
 
       await pool.query(
