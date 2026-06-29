@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { SocketService, LeaderboardEntry, LiveMatch } from '../../services/socket';
 import { HttpClient } from '@angular/common/http';
 import { Subscription } from 'rxjs';
@@ -135,15 +136,17 @@ export class Leaderboard implements OnInit, OnDestroy {
   private rotateInterval: any;
   private espnInterval: any;
 
+  streamUrl: SafeResourceUrl;
+  showStream = false;
+
   constructor(
     private socketService: SocketService,
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
-    private zone: NgZone
-  ) {}
-
-  openStream() {
-    window.open('https://la16hd.com/dsportsar.php', 'dsports', 'width=640,height=380,resizable=yes');
+    private zone: NgZone,
+    private sanitizer: DomSanitizer
+  ) {
+    this.streamUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://la16hd.com/dsportsar.php');
   }
 
   ngOnInit() {
