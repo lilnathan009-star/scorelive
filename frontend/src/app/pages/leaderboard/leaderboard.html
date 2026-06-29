@@ -276,6 +276,28 @@
     <!-- ══ COLUMNA PRINCIPAL ══ -->
     <div class="lb-main">
 
+      <!-- MINI PLAYER -->
+      <div class="mini-player" [class.open]="showStream">
+        <div class="mini-player-bar" (click)="showStream = !showStream">
+          <span class="mini-player-dot"></span>
+          <span class="mini-player-label">D Sports</span>
+          @if (liveMatch) {
+            <span class="mini-player-match">{{ liveMatch.home_team }} vs {{ liveMatch.away_team }}</span>
+          }
+          <span class="mini-player-toggle">{{ showStream ? '▼' : '▲' }}</span>
+        </div>
+        @if (showStream) {
+          <iframe
+            class="mini-player-iframe"
+            [src]="streamUrl"
+            allowfullscreen
+            allow="autoplay; encrypted-media"
+            scrolling="no"
+            frameborder="0">
+          </iframe>
+        }
+      </div>
+
       @if (entries.length === 0) {
         <div class="lb-empty">Cargando clasificación...</div>
       }
@@ -674,23 +696,5 @@
     </div>
   }
 
-  <!-- MINI PLAYER -->
-  <div class="mini-player" [class.open]="showStream">
-    <div class="mini-player-bar" (click)="showStream = !showStream">
-      <span class="mini-player-dot"></span>
-      <span>D Sports</span>
-      <span class="mini-player-toggle">{{ showStream ? '▼' : '▲' }}</span>
-    </div>
-    @if (showStream) {
-      <iframe
-        class="mini-player-iframe"
-        [src]="streamUrl"
-        allowfullscreen
-        allow="autoplay; encrypted-media"
-        scrolling="no"
-        frameborder="0">
-      </iframe>
-    }
-  </div>
 
 </div>

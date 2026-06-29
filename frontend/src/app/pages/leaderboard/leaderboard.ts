@@ -255,6 +255,10 @@ export class Leaderboard implements OnInit, OnDestroy {
     return this.liveMatches[this.currentMatchIdx] ?? null;
   }
 
+  get liveMatch(): LiveMatch | null {
+    return this.liveMatches[0] ?? null;
+  }
+
   getFlagUrl(team: string): string { return getFlagUrl(team); }
   teamEs(name: string): string { return teamEs(name); }
 
