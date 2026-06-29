@@ -675,22 +675,12 @@
   }
 
   <!-- MINI PLAYER -->
-  <div class="mini-player" [class.open]="showStream">
-    <div class="mini-player-bar" (click)="showStream = !showStream">
+  <div class="mini-player" (click)="openStream()">
+    <div class="mini-player-bar">
       <span class="mini-player-dot"></span>
       <span>D Sports</span>
-      <span class="mini-player-toggle">{{ showStream ? '▼' : '▲' }}</span>
+      <span class="mini-player-toggle">▶</span>
     </div>
-    @if (showStream) {
-      <iframe
-        class="mini-player-iframe"
-        [src]="streamUrl"
-        allowfullscreen
-        allow="autoplay; encrypted-media"
-        scrolling="no"
-        frameborder="0">
-      </iframe>
-    }
   </div>
 
 </div>
